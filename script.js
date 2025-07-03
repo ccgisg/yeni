@@ -5,6 +5,7 @@ let people = [];
 let doctorInfo = {};
 let isMonthlyMenuOpen = false;
 const DEFAULT_PASSWORD = "1234"; // Basit bir şifre
+const APP_FOLDER_NAME = "İşyeriHekimiVeri"; // Masaüstünde oluşacak klasör adı
 
 // DOM yüklendiğinde çalışacak fonksiyonlar
 document.addEventListener('DOMContentLoaded', function() {
@@ -49,8 +50,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Uygulamayı başlatma fonksiyonu
 function initializeApp() {
-    // Klasör oluşturma işlemi (Electron veya başka bir yöntemle masaüstünde klasör oluşturulabilir)
-    // Bu örnekte sadece tarayıcıda çalışan bir simülasyon yapıyoruz
+    // Masaüstünde klasör oluştur (simülasyon)
+    createAppFolder();
     
     // Doktor bilgilerini yükle
     loadDoctorInfo();
@@ -66,6 +67,12 @@ function initializeApp() {
     
     // Event listener'ları ekle
     setupEventListeners();
+}
+
+// Masaüstünde uygulama klasörü oluştur (simülasyon)
+function createAppFolder() {
+    console.log(`Masaüstünde '${APP_FOLDER_NAME}' klasörü oluşturuldu (simülasyon)`);
+    // Gerçek uygulamada burada Electron veya başka bir yöntemle klasör oluşturulacak
 }
 
 // Doktor bilgilerini yükle
@@ -300,13 +307,23 @@ function formatDate(date) {
 function setupDateInputs() {
     document.querySelectorAll('input[placeholder="gg.aa.yyyy"]').forEach(input => {
         input.addEventListener('input', function(e) {
-            let value = this.value.replace(/\D/g, '');
+            let value = this.value.replace(/[^0-9]/g, '');
+            
             if (value.length > 2 && value.length <= 4) {
                 value = value.substring(0, 2) + '.' + value.substring(2);
             } else if (value.length > 4) {
                 value = value.substring(0, 2) + '.' + value.substring(2, 4) + '.' + value.substring(4, 8);
             }
+            
             this.value = value.substring(0, 10);
+        });
+        
+        // Blur olduğunda formatı kontrol et
+        input.addEventListener('blur', function() {
+            if (this.value && !/^\d{2}\.\d{2}\.\d{4}$/.test(this.value)) {
+                alert('Lütfen geçerli bir tarih formatı girin (gg.aa.yyyy)');
+                this.focus();
+            }
         });
     });
 }
@@ -322,8 +339,6 @@ function openEk2Document(person) {
     // 5 yıl sonrasını hesapla
     const nextExamDate = `${day}.${month}.${year + 5}`;
     
-    alert(`Ek-2 belgesi oluşturuluyor:\nTC: ${person.tc}\nAd Soyad: ${person.name}\nMuayene Tarihi: ${examDate}\nSonraki Muayene Tarihi: ${nextExamDate}`);
-    
     // Kişiyi güncelle
     person.examDate = examDate;
     person.nextExamDate = nextExamDate;
@@ -332,7 +347,9 @@ function openEk2Document(person) {
     
     // Masaüstüne kaydetme işlemi (simülasyon)
     const fileName = `Ek2_${person.tc}_${person.name.replace(/\s+/g, '_')}.docx`;
-    console.log(`Belge ${fileName} olarak kaydedildi.`);
+    console.log(`Belge ${fileName} olarak '${APP_FOLDER_NAME}' klasörüne kaydedildi (simülasyon)`);
+    
+    alert(`Ek-2 belgesi oluşturuldu:\nTC: ${person.tc}\nAd Soyad: ${person.name}\nMuayene Tarihi: ${examDate}\nSonraki Muayene Tarihi: ${nextExamDate}\n\nBelge '${APP_FOLDER_NAME}' klasörüne kaydedildi.`);
 }
 
 // Ek-2 belgesi yükle
@@ -344,12 +361,39 @@ function uploadEk2Document(tc) {
     fileInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
-            alert(`${file.name} dosyası yüklendi (TC: ${tc})`);
-            // Burada dosyayı kaydetme işlemi yapılacak
+            console.log(`Dosya '${APP_FOLDER_NAME}' klasörüne kaydedildi (simülasyon):`, file.name);
+            alert(`${file.name} dosyası '${APP_FOLDER_NAME}' klasörüne yüklendi (TC: ${tc})`);
         }
     });
     
     fileInput.click();
+}
+
+// Veritabanı yedekle
+function backupDatabase() {
+    const backupData = {
+        workplaces: workplaces,
+        people: {},
+        doctorInfo: doctorInfo
+    };
+    
+    // Tüm işyerlerindeki kişileri yedekle
+    workplaces.forEach(workplace => {
+        const peopleData = localStorage.getItem(`people_${workplace.id}`);
+        if (peopleData) {
+            backupData.people[workplace.id] = JSON.parse(peopleData);
+        }
+    });
+    
+    const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `isyeri_hekimligi_yedek_${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    
+    console.log(`Yedekleme '${APP_FOLDER_NAME}' klasörüne kaydedildi (simülasyon)`);
+    alert(`Veritabanı yedeği '${APP_FOLDER_NAME}' klasörüne kaydedildi.`);
 }
 
 // Ek-2 belgelerini göster
@@ -357,17 +401,16 @@ function showEk2Documents(tc) {
     const ek2ListModal = document.getElementById('ek2ListModal');
     const ek2DocumentsList = document.getElementById('ek2DocumentsList');
     
-    // Burada gerçekte dosya sisteminden belgeleri okumak gerekir
-    // Simülasyon olarak birkaç örnek belge gösteriyoruz
     ek2DocumentsList.innerHTML = '';
     
+    // Simülasyon: 3 örnek belge göster
     for (let i = 1; i <= 3; i++) {
         const docElement = document.createElement('div');
         docElement.className = 'document-card';
         docElement.textContent = `Ek2_${tc}_${i}.docx`;
         
         docElement.addEventListener('dblclick', function() {
-            alert(`Belge açılıyor: Ek2_${tc}_${i}.docx`);
+            alert(`Belge açılıyor: ${APP_FOLDER_NAME}/Ek2_${tc}_${i}.docx`);
         });
         
         ek2DocumentsList.appendChild(docElement);
@@ -408,8 +451,7 @@ function openMonthlyDocuments(monthName, year) {
         docElement.appendChild(docInfo);
         
         docElement.addEventListener('click', function() {
-            // Burada belge açma işlemi simüle ediliyor
-            alert(`${monthName} ${year} ${doc} belgesi açılıyor...`);
+            alert(`${APP_FOLDER_NAME}/${monthName} ${year} ${doc} belgesi açılıyor...`);
         });
         
         documentsList.appendChild(docElement);
@@ -507,7 +549,7 @@ function setupEventListeners() {
             // Düzenleme
             const index = people.findIndex(p => p.id === personId);
             if (index !== -1) {
-                // Mevcut examDate ve nextExamDate'i koru
+                // Mevcut tarihleri koru
                 personData.examDate = people[index].examDate;
                 personData.nextExamDate = people[index].nextExamDate;
                 people[index] = { ...people[index], ...personData };
@@ -550,13 +592,45 @@ function setupEventListeners() {
         alert('Excel\'e veri aktarılacak (simülasyon)');
     });
     
-    // Yedekleme işlemleri (simülasyon)
+    // Yedekleme işlemleri
     document.getElementById('backupBtn').addEventListener('click', function() {
-        alert('Yedek alınıyor (simülasyon)');
+        backupDatabase();
     });
     
     document.getElementById('restoreBtn').addEventListener('click', function() {
-        alert('Yedekten dönülüyor (simülasyon)');
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.json';
+        
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const backupData = JSON.parse(e.target.result);
+                        workplaces = backupData.workplaces || [];
+                        doctorInfo = backupData.doctorInfo || {};
+                        
+                        // Kişileri geri yükle
+                        Object.keys(backupData.people || {}).forEach(workplaceId => {
+                            localStorage.setItem(`people_${workplaceId}`, JSON.stringify(backupData.people[workplaceId]));
+                        });
+                        
+                        localStorage.setItem('workplaces', JSON.stringify(workplaces));
+                        localStorage.setItem('doctorInfo', JSON.stringify(doctorInfo));
+                        
+                        alert('Yedekten başarıyla dönüldü!');
+                        renderWorkplacesList();
+                    } catch (error) {
+                        alert('Yedek dosyası okunurken hata oluştu: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            }
+        });
+        
+        fileInput.click();
     });
 }
 
