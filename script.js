@@ -1,203 +1,65 @@
-// Genel Değişkenler
+// Global variables
 let currentWorkplace = null;
-let workplaces = JSON.parse(localStorage.getItem('workplaces')) || [];
-let employees = JSON.parse(localStorage.getItem('employees')) || [];
-let doctorInfo = JSON.parse(localStorage.getItem('doctorInfo')) || {};
-let password = "hekim123"; // Basit şifre
+let employees = [];
+let workplaces = [];
+let doctorInfo = {};
+let currentMonth = '';
 
-// DOM Elementleri
-const loginModal = document.getElementById('loginModal');
-const passwordInput = document.getElementById('passwordInput');
-const loginBtn = document.getElementById('loginBtn');
-
-const monthlyTasksBtn = document.getElementById('monthlyTasksBtn');
-const monthlyTasksDropdown = document.getElementById('monthlyTasksDropdown');
-const workplacesList = document.getElementById('workplacesList');
-const addWorkplaceBtn = document.getElementById('addWorkplaceBtn');
-const settingsBtn = document.getElementById('settingsBtn');
-const logoutBtn = document.getElementById('logoutBtn');
-const contentArea = document.getElementById('contentArea');
-
-const workplaceModal = document.getElementById('workplaceModal');
-const workplaceName = document.getElementById('workplaceName');
-const workplaceSgkNo = document.getElementById('workplaceSgkNo');
-const workplaceAddress = document.getElementById('workplaceAddress');
-const workplacePhone = document.getElementById('workplacePhone');
-const workplaceEmail = document.getElementById('workplaceEmail');
-const saveWorkplaceBtn = document.getElementById('saveWorkplaceBtn');
-const cancelWorkplaceBtn = document.getElementById('cancelWorkplaceBtn');
-
-const employeeModal = document.getElementById('employeeModal');
-const employeeTcNo = document.getElementById('employeeTcNo');
-const employeeName = document.getElementById('employeeName');
-const employeeBirthInfo = document.getElementById('employeeBirthInfo');
-const employeeGender = document.getElementById('employeeGender');
-const employeeLastExam = document.getElementById('employeeLastExam');
-const employeeNextExam = document.getElementById('employeeNextExam');
-const saveEmployeeBtn = document.getElementById('saveEmployeeBtn');
-const cancelEmployeeBtn = document.getElementById('cancelEmployeeBtn');
-
-const settingsModal = document.getElementById('settingsModal');
-const doctorName = document.getElementById('doctorName');
-const diplomaNo = document.getElementById('diplomaNo');
-const diplomaDate = document.getElementById('diplomaDate');
-const registrationNo = document.getElementById('registrationNo');
-const registrationDate = document.getElementById('registrationDate');
-const certificateNo = document.getElementById('certificateNo');
-const certificateDate = document.getElementById('certificateDate');
-const saveSettingsBtn = document.getElementById('saveSettingsBtn');
-const cancelSettingsBtn = document.getElementById('cancelSettingsBtn');
-
-// Sayfa Yüklendiğinde
-document.addEventListener('DOMContentLoaded', () => {
-    // Şifre kontrolü için login modalını göster
-    loginModal.style.display = 'block';
+// DOM Content Loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize monthly folders
+    initializeMonths();
     
-    // Doktor bilgilerini yükle
-    loadDoctorInfo();
+    // Load data from localStorage
+    loadData();
     
-    // Aylık klasörleri oluştur
-    setupMonthlyFolders();
-    
-    // İşyeri listesini yükle
-    loadWorkplaces();
+    // Setup event listeners
+    setupEventListeners();
 });
 
-// Giriş Butonu
-loginBtn.addEventListener('click', () => {
-    if (passwordInput.value === password) {
-        loginModal.style.display = 'none';
-    } else {
-        alert('Hatalı şifre!');
-    }
-});
-
-// Aylık İşler Butonu
-monthlyTasksBtn.addEventListener('click', () => {
-    monthlyTasksDropdown.style.display = monthlyTasksDropdown.style.display === 'block' ? 'none' : 'block';
-});
-
-// İşyeri Ekle Butonu
-addWorkplaceBtn.addEventListener('click', () => {
-    workplaceModalTitle.textContent = 'İşyeri Ekle';
-    workplaceName.value = '';
-    workplaceSgkNo.value = '';
-    workplaceAddress.value = '';
-    workplacePhone.value = '';
-    workplaceEmail.value = '';
-    workplaceModal.style.display = 'block';
-});
-
-// Ayarlar Butonu
-settingsBtn.addEventListener('click', () => {
-    settingsModal.style.display = 'block';
-});
-
-// Çıkış Butonu
-logoutBtn.addEventListener('click', () => {
-    if (confirm('Çıkış yapmak istediğinize emin misiniz?')) {
-        window.location.reload();
-    }
-});
-
-// İşyeri Kaydet Butonu
-saveWorkplaceBtn.addEventListener('click', () => {
-    const newWorkplace = {
-        id: Date.now(),
-        name: workplaceName.value,
-        sgkNo: workplaceSgkNo.value,
-        address: workplaceAddress.value,
-        phone: workplacePhone.value,
-        email: workplaceEmail.value
-    };
-    
-    workplaces.push(newWorkplace);
-    saveWorkplaces();
-    loadWorkplaces();
-    workplaceModal.style.display = 'none';
-});
-
-// İşyeri İptal Butonu
-cancelWorkplaceBtn.addEventListener('click', () => {
-    workplaceModal.style.display = 'none';
-});
-
-// Çalışan Kaydet Butonu
-saveEmployeeBtn.addEventListener('click', () => {
-    const newEmployee = {
-        workplaceId: currentWorkplace,
-        tcNo: employeeTcNo.value,
-        name: employeeName.value,
-        birthInfo: employeeBirthInfo.value,
-        gender: employeeGender.value,
-        lastExam: employeeLastExam.value,
-        nextExam: employeeNextExam.value,
-        ek2Data: null
-    };
-    
-    employees.push(newEmployee);
-    saveEmployees();
-    loadEmployees(currentWorkplace);
-    employeeModal.style.display = 'none';
-});
-
-// Çalışan İptal Butonu
-cancelEmployeeBtn.addEventListener('click', () => {
-    employeeModal.style.display = 'none';
-});
-
-// Ayarları Kaydet Butonu
-saveSettingsBtn.addEventListener('click', () => {
-    doctorInfo = {
-        name: doctorName.value,
-        diplomaNo: diplomaNo.value,
-        diplomaDate: diplomaDate.value,
-        registrationNo: registrationNo.value,
-        registrationDate: registrationDate.value,
-        certificateNo: certificateNo.value,
-        certificateDate: certificateDate.value
-    };
-    
-    localStorage.setItem('doctorInfo', JSON.stringify(doctorInfo));
-    settingsModal.style.display = 'none';
-});
-
-// Ayarları İptal Butonu
-cancelSettingsBtn.addEventListener('click', () => {
-    settingsModal.style.display = 'none';
-});
-
-// Aylık Klasörleri Oluştur
-function setupMonthlyFolders() {
+// Initialize months
+function initializeMonths() {
     const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
+    const currentDay = now.getDate();
+    let year = now.getFullYear();
+    let month = now.getMonth();
     
-    // Eğer ayın 15'inden sonraysa bir sonraki ayın klasörünü de ekle
-    const monthsToShow = now.getDate() > 15 ? 
-        [currentMonth, (currentMonth + 1) % 12] : 
-        [currentMonth];
+    // If after the 15th, show next month
+    if (currentDay > 15) {
+        month += 1;
+        if (month > 11) {
+            month = 0;
+            year += 1;
+        }
+    }
     
-    monthlyTasksDropdown.innerHTML = '';
+    currentMonth = `${year} ${getMonthName(month)}`;
     
-    monthsToShow.forEach(month => {
-        const monthName = getMonthName(month);
-        const year = month < currentMonth || (now.getDate() > 15 && month === (currentMonth + 1) % 12) ? 
-            currentYear + 1 : 
-            currentYear;
-            
-        const monthItem = document.createElement('a');
-        monthItem.href = '#';
-        monthItem.textContent = `${year} ${monthName}`;
-        monthItem.addEventListener('click', () => {
-            alert(`${year} ${monthName} ayı seçildi`);
-        });
+    // Generate months for the submenu
+    const monthSubmenu = document.getElementById('month-submenu');
+    monthSubmenu.innerHTML = '';
+    
+    // Show current and next 3 months
+    for (let i = 0; i < 4; i++) {
+        const monthName = `${year} ${getMonthName(month)}`;
+        const monthItem = document.createElement('div');
+        monthItem.className = 'month-item';
+        monthItem.textContent = monthName;
+        monthItem.onclick = function() {
+            // You can add functionality here for month selection
+            alert(`${monthName} seçildi`);
+        };
+        monthSubmenu.appendChild(monthItem);
         
-        monthlyTasksDropdown.appendChild(monthItem);
-    });
+        month += 1;
+        if (month > 11) {
+            month = 0;
+            year += 1;
+        }
+    }
 }
 
-// Ay ismini al
+// Get month name
 function getMonthName(monthIndex) {
     const months = [
         'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
@@ -206,244 +68,438 @@ function getMonthName(monthIndex) {
     return months[monthIndex];
 }
 
-// İşyerlerini Yükle
-function loadWorkplaces() {
-    workplacesList.innerHTML = '';
+// Load data from localStorage
+function loadData() {
+    const savedWorkplaces = localStorage.getItem('workplaces');
+    if (savedWorkplaces) {
+        workplaces = JSON.parse(savedWorkplaces);
+        updateWorkplaceList();
+    }
     
+    const savedDoctorInfo = localStorage.getItem('doctorInfo');
+    if (savedDoctorInfo) {
+        doctorInfo = JSON.parse(savedDoctorInfo);
+        document.getElementById('doctor-name').value = doctorInfo.name || '';
+        document.getElementById('diploma-date').value = doctorInfo.diplomaDate || '';
+        document.getElementById('diploma-reg-date').value = doctorInfo.diplomaRegDate || '';
+        document.getElementById('workplace-certificate').value = doctorInfo.workplaceCertificate || '';
+    }
+}
+
+// Save data to localStorage
+function saveData() {
+    localStorage.setItem('workplaces', JSON.stringify(workplaces));
+    localStorage.setItem('doctorInfo', JSON.stringify(doctorInfo));
+}
+
+// Setup event listeners
+function setupEventListeners() {
+    // Monthly jobs menu toggle
+    document.getElementById('monthly-jobs').addEventListener('click', function() {
+        const submenu = document.getElementById('month-submenu');
+        submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
+    });
+    
+    // Workplaces menu toggle
+    document.getElementById('workplaces').addEventListener('click', function() {
+        const submenu = document.getElementById('workplace-submenu');
+        submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
+    });
+    
+    // Doctor settings form
+    document.getElementById('doctor-settings').addEventListener('submit', function(e) {
+        e.preventDefault();
+        saveDoctorInfo();
+    });
+    
+    // Employee form
+    document.getElementById('employee-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        saveEmployee();
+    });
+}
+
+// Login function
+function login() {
+    const password = document.getElementById('password').value;
+    // Default password is 1234
+    if (password === '1234' || password === '') {
+        document.getElementById('login-container').style.display = 'none';
+        document.getElementById('main-container').style.display = 'flex';
+    } else {
+        alert('Hatalı şifre! Varsayılan şifre: 1234');
+    }
+}
+
+// Logout function
+function logout() {
+    document.getElementById('login-container').style.display = 'block';
+    document.getElementById('main-container').style.display = 'none';
+    document.getElementById('password').value = '';
+}
+
+// Show settings
+function showSettings() {
+    document.getElementById('dashboard-content').style.display = 'none';
+    document.getElementById('workplace-content').style.display = 'none';
+    document.getElementById('employee-form-container').style.display = 'none';
+    document.getElementById('settings-content').style.display = 'block';
+}
+
+// Back to main
+function backToMain() {
+    document.getElementById('dashboard-content').style.display = 'block';
+    document.getElementById('workplace-content').style.display = 'none';
+    document.getElementById('employee-form-container').style.display = 'none';
+    document.getElementById('settings-content').style.display = 'none';
+}
+
+// Back to workplace
+function backToWorkplace() {
+    document.getElementById('employee-form-container').style.display = 'none';
+    document.getElementById('workplace-content').style.display = 'block';
+}
+
+// Save doctor info
+function saveDoctorInfo() {
+    doctorInfo = {
+        name: document.getElementById('doctor-name').value,
+        diplomaDate: document.getElementById('diploma-date').value,
+        diplomaRegDate: document.getElementById('diploma-reg-date').value,
+        workplaceCertificate: document.getElementById('workplace-certificate').value
+    };
+    
+    saveData();
+    alert('Doktor bilgileri kaydedildi!');
+}
+
+// Add workplace
+function addWorkplace() {
+    const workplaceName = prompt('İşyeri adını girin:');
+    if (workplaceName) {
+        const newWorkplace = {
+            id: Date.now(),
+            name: workplaceName,
+            employees: []
+        };
+        
+        workplaces.push(newWorkplace);
+        saveData();
+        updateWorkplaceList();
+    }
+}
+
+// Update workplace list
+function updateWorkplaceList() {
+    const workplaceSubmenu = document.getElementById('workplace-submenu');
+    // Clear existing items except the "Add Workplace" button
+    workplaceSubmenu.innerHTML = '<button onclick="addWorkplace()">İşyeri Ekle</button>';
+    
+    // Add edit and delete buttons for each workplace
     workplaces.forEach(workplace => {
         const workplaceItem = document.createElement('div');
         workplaceItem.className = 'workplace-item';
         workplaceItem.textContent = workplace.name;
-        workplaceItem.addEventListener('click', () => {
-            currentWorkplace = workplace.id;
-            showWorkplace(workplace);
-        });
-        
-        workplacesList.appendChild(workplaceItem);
-    });
-}
-
-// İşyeri Detaylarını Göster
-function showWorkplace(workplace) {
-    contentArea.innerHTML = `
-        <div class="workplace-header">
-            <h2>${workplace.name}</h2>
-            <div class="workplace-actions">
-                <button id="importExcelBtn" class="action-btn">Excel'den Al</button>
-                <button id="exportExcelBtn" class="action-btn">Excel'e Ver</button>
-                <button id="backupBtn" class="action-btn">Yedek Al</button>
-                <button id="restoreBtn" class="action-btn">Yedekten Dön</button>
-                <button id="addEmployeeBtn" class="action-btn">Çalışan Ekle</button>
-                <button id="backToMainBtn" class="action-btn">Geri</button>
-            </div>
-        </div>
-        <div id="employeesTableContainer"></div>
-    `;
-    
-    // Buton event listener'larını ekle
-    document.getElementById('addEmployeeBtn').addEventListener('click', () => {
-        employeeModalTitle.textContent = 'Çalışan Ekle';
-        employeeTcNo.value = '';
-        employeeName.value = '';
-        employeeBirthInfo.value = '';
-        employeeGender.value = '';
-        employeeLastExam.value = '';
-        employeeNextExam.value = '';
-        employeeModal.style.display = 'block';
-    });
-    
-    document.getElementById('backToMainBtn').addEventListener('click', () => {
-        currentWorkplace = null;
-        contentArea.innerHTML = `
-            <h1>Hoş Geldiniz</h1>
-            <p>Soldaki menüden işyerlerinizi seçebilir veya yeni işyeri ekleyebilirsiniz.</p>
-        `;
-    });
-    
-    document.getElementById('importExcelBtn').addEventListener('click', importFromExcel);
-    document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
-    document.getElementById('backupBtn').addEventListener('click', createBackup);
-    document.getElementById('restoreBtn').addEventListener('click', restoreFromBackup);
-    
-    // Çalışan listesini yükle
-    loadEmployees(workplace.id);
-}
-
-// Çalışanları Yükle
-function loadEmployees(workplaceId) {
-    const container = document.getElementById('employeesTableContainer');
-    if (!container) return;
-    
-    const workplaceEmployees = employees.filter(emp => emp.workplaceId === workplaceId);
-    
-    let tableHTML = `
-        <table class="employee-table">
-            <thead>
-                <tr>
-                    <th>Sıra No</th>
-                    <th>TC Kimlik No</th>
-                    <th>Ad Soyad</th>
-                    <th>Mevcut Muayene Tarihi</th>
-                    <th>Sonraki Muayene Tarihi</th>
-                    <th>İşlemler</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-    
-    workplaceEmployees.forEach((emp, index) => {
-        tableHTML += `
-            <tr>
-                <td>${index + 1}</td>
-                <td>${emp.tcNo}</td>
-                <td>${emp.name}</td>
-                <td>${emp.lastExam || '-'}</td>
-                <td>${emp.nextExam || '-'}</td>
-                <td>
-                    <button class="table-btn btn-ek2" onclick="showEk2Form(${emp.tcNo})">EK-2</button>
-                    <button class="table-btn btn-show" onclick="showEmployee(${emp.tcNo})">Göster</button>
-                    <button class="table-btn btn-edit" onclick="editEmployee(${emp.tcNo})">Düzenle</button>
-                    <button class="table-btn btn-delete" onclick="deleteEmployee(${emp.tcNo})">Sil</button>
-                </td>
-            </tr>
-        `;
-    });
-    
-    tableHTML += `
-            </tbody>
-        </table>
-    `;
-    
-    container.innerHTML = tableHTML;
-}
-
-// Çalışan Göster
-function showEmployee(tcNo) {
-    const employee = employees.find(emp => emp.tcNo === tcNo.toString());
-    if (employee) {
-        alert(`Çalışan Bilgileri:\nTC: ${employee.tcNo}\nAd Soyad: ${employee.name}\nDoğum: ${employee.birthInfo}\nCinsiyet: ${employee.gender}\nSon Muayene: ${employee.lastExam}\nSonraki Muayene: ${employee.nextExam}`);
-    }
-}
-
-// Çalışan Düzenle
-function editEmployee(tcNo) {
-    const employee = employees.find(emp => emp.tcNo === tcNo.toString());
-    if (employee) {
-        employeeModalTitle.textContent = 'Çalışan Düzenle';
-        employeeTcNo.value = employee.tcNo;
-        employeeName.value = employee.name;
-        employeeBirthInfo.value = employee.birthInfo;
-        employeeGender.value = employee.gender;
-        employeeLastExam.value = employee.lastExam;
-        employeeNextExam.value = employee.nextExam;
-        employeeModal.style.display = 'block';
-    }
-}
-
-// Çalışan Sil
-function deleteEmployee(tcNo) {
-    if (confirm('Bu çalışanı silmek istediğinize emin misiniz?')) {
-        employees = employees.filter(emp => emp.tcNo !== tcNo.toString());
-        saveEmployees();
-        loadEmployees(currentWorkplace);
-    }
-}
-
-// EK-2 Formunu Göster
-function showEk2Form(tcNo) {
-    const employee = employees.find(emp => emp.tcNo === tcNo.toString());
-    if (employee) {
-        // Burada EK-2 formunu doldurup gösterebilirsiniz
-        // Örnek olarak basit bir alert gösteriyoruz
-        alert(`EK-2 Formu:\nÇalışan: ${employee.name}\nTC: ${employee.tcNo}\n\nBurada EK-2 formu gösterilecek.`);
-    }
-}
-
-// Excel'den İçe Aktar
-function importFromExcel() {
-    alert('Excel verisi içe aktarılacak. Bu işlev tam olarak uygulanmadı.');
-}
-
-// Excel'e Dışa Aktar
-function exportToExcel() {
-    alert('Excel verisi dışa aktarılacak. Bu işlev tam olarak uygulanmadı.');
-}
-
-// Yedek Oluştur
-function createBackup() {
-    const backupData = {
-        workplaces: workplaces,
-        employees: employees,
-        doctorInfo: doctorInfo
-    };
-    
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `isyeri_hekimligi_yedek_${new Date().toISOString().slice(0,10)}.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    document.body.removeChild(downloadAnchor);
-}
-
-// Yedekten Geri Yükle
-function restoreFromBackup() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-    
-    input.onchange = e => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        
-        reader.onload = event => {
-            try {
-                const backupData = JSON.parse(event.target.result);
-                
-                if (backupData.workplaces && backupData.employees && backupData.doctorInfo) {
-                    if (confirm('Yedekten geri yükleme yapılacak. Mevcut verileriniz silinecek. Devam etmek istiyor musunuz?')) {
-                        workplaces = backupData.workplaces;
-                        employees = backupData.employees;
-                        doctorInfo = backupData.doctorInfo;
-                        
-                        localStorage.setItem('workplaces', JSON.stringify(workplaces));
-                        localStorage.setItem('employees', JSON.stringify(employees));
-                        localStorage.setItem('doctorInfo', JSON.stringify(doctorInfo));
-                        
-                        loadWorkplaces();
-                        loadDoctorInfo();
-                        alert('Yedek başarıyla geri yüklendi.');
-                    }
-                } else {
-                    alert('Geçersiz yedek dosyası!');
-                }
-            } catch (error) {
-                alert('Yedek dosyası okunurken hata oluştu: ' + error.message);
-            }
+        workplaceItem.onclick = function() {
+            openWorkplace(workplace);
         };
         
-        reader.readAsText(file);
+        const editBtn = document.createElement('button');
+        editBtn.textContent = 'Düzenle';
+        editBtn.onclick = function(e) {
+            e.stopPropagation();
+            editWorkplace(workplace);
+        };
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Sil';
+        deleteBtn.onclick = function(e) {
+            e.stopPropagation();
+            deleteWorkplace(workplace);
+        };
+        
+        workplaceItem.appendChild(editBtn);
+        workplaceItem.appendChild(deleteBtn);
+        workplaceSubmenu.appendChild(workplaceItem);
+    });
+}
+
+// Edit workplace
+function editWorkplace(workplace) {
+    const newName = prompt('Yeni işyeri adını girin:', workplace.name);
+    if (newName) {
+        workplace.name = newName;
+        saveData();
+        updateWorkplaceList();
+    }
+}
+
+// Delete workplace
+function deleteWorkplace(workplace) {
+    if (confirm(`"${workplace.name}" işyerini silmek istediğinize emin misiniz?`)) {
+        workplaces = workplaces.filter(w => w.id !== workplace.id);
+        saveData();
+        updateWorkplaceList();
+        
+        if (currentWorkplace && currentWorkplace.id === workplace.id) {
+            backToMain();
+        }
+    }
+}
+
+// Open workplace
+function openWorkplace(workplace) {
+    currentWorkplace = workplace;
+    employees = workplace.employees;
+    
+    document.getElementById('workplace-title').textContent = workplace.name;
+    document.getElementById('dashboard-content').style.display = 'none';
+    document.getElementById('workplace-content').style.display = 'block';
+    document.getElementById('settings-content').style.display = 'none';
+    document.getElementById('employee-form-container').style.display = 'none';
+    
+    updateEmployeeList();
+}
+
+// Update employee list
+function updateEmployeeList() {
+    const employeeList = document.getElementById('employee-list');
+    employeeList.innerHTML = '';
+    
+    employees.forEach((employee, index) => {
+        const row = document.createElement('tr');
+        
+        row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${employee.tc}</td>
+            <td>${employee.name}</td>
+            <td>${formatDate(employee.currentExam)}</td>
+            <td>${formatDate(employee.nextExam)}</td>
+            <td>
+                <button class="ek2-btn" onclick="viewEk2(${employee.id})">Göster</button>
+                <button class="ek2-btn" onclick="uploadEk2(${employee.id})">Yükle</button>
+            </td>
+            <td>
+                <button class="edit-btn" onclick="editEmployee(${employee.id})">Düzenle</button>
+                <button class="delete-btn" onclick="deleteEmployee(${employee.id})">Sil</button>
+            </td>
+        `;
+        
+        employeeList.appendChild(row);
+    });
+}
+
+// Format date
+function formatDate(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('tr-TR');
+}
+
+// Add employee
+function addEmployee() {
+    document.getElementById('employee-form-title').textContent = 'Yeni Kişi Ekle';
+    document.getElementById('employee-id').value = '';
+    document.getElementById('employee-tc').value = '';
+    document.getElementById('employee-name').value = '';
+    document.getElementById('current-exam').value = '';
+    document.getElementById('next-exam').value = '';
+    document.getElementById('ek2-file').value = '';
+    
+    document.getElementById('workplace-content').style.display = 'none';
+    document.getElementById('employee-form-container').style.display = 'block';
+}
+
+// Edit employee
+function editEmployee(employeeId) {
+    const employee = employees.find(e => e.id === employeeId);
+    if (employee) {
+        document.getElementById('employee-form-title').textContent = 'Kişiyi Düzenle';
+        document.getElementById('employee-id').value = employee.id;
+        document.getElementById('employee-tc').value = employee.tc;
+        document.getElementById('employee-name').value = employee.name;
+        document.getElementById('current-exam').value = employee.currentExam;
+        document.getElementById('next-exam').value = employee.nextExam;
+        
+        document.getElementById('workplace-content').style.display = 'none';
+        document.getElementById('employee-form-container').style.display = 'block';
+    }
+}
+
+// Save employee
+function saveEmployee() {
+    const id = document.getElementById('employee-id').value;
+    const tc = document.getElementById('employee-tc').value;
+    const name = document.getElementById('employee-name').value;
+    const currentExam = document.getElementById('current-exam').value;
+    const nextExam = document.getElementById('next-exam').value;
+    const ek2File = document.getElementById('ek2-file').files[0];
+    
+    if (id) {
+        // Update existing employee
+        const employee = employees.find(e => e.id === parseInt(id));
+        if (employee) {
+            employee.tc = tc;
+            employee.name = name;
+            employee.currentExam = currentExam;
+            employee.nextExam = nextExam;
+        }
+    } else {
+        // Add new employee
+        const newEmployee = {
+            id: Date.now(),
+            tc,
+            name,
+            currentExam,
+            nextExam
+        };
+        employees.push(newEmployee);
+    }
+    
+    // Handle file upload (in a real app, you would save this to a server)
+    if (ek2File) {
+        alert(`Ek-2 dosyası yüklendi: ${ek2File.name}`);
+        // In a real app, you would save the file and store the reference
+    }
+    
+    // Update workplace data
+    if (currentWorkplace) {
+        currentWorkplace.employees = employees;
+        saveData();
+    }
+    
+    updateEmployeeList();
+    backToWorkplace();
+}
+
+// Delete employee
+function deleteEmployee(employeeId) {
+    if (confirm('Bu kişiyi silmek istediğinize emin misiniz?')) {
+        employees = employees.filter(e => e.id !== employeeId);
+        
+        if (currentWorkplace) {
+            currentWorkplace.employees = employees;
+            saveData();
+        }
+        
+        updateEmployeeList();
+    }
+}
+
+// View Ek-2
+function viewEk2(employeeId) {
+    const employee = employees.find(e => e.id === employeeId);
+    if (employee) {
+        alert(`Ek-2 formu gösteriliyor: ${employee.name}`);
+        // In a real app, you would display the actual Ek-2 form
+    }
+}
+
+// Upload Ek-2
+function uploadEk2(employeeId) {
+    const employee = employees.find(e => e.id === employeeId);
+    if (employee) {
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.docx,.pdf';
+        fileInput.onchange = function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                alert(`Ek-2 dosyası yüklendi: ${file.name} (${employee.name})`);
+                // In a real app, you would save the file and store the reference
+            }
+        };
+        fileInput.click();
+    }
+}
+
+// Export to Excel
+function exportToExcel() {
+    if (!currentWorkplace) return;
+    
+    // Create CSV content
+    let csvContent = "S.No,TC Kimlik No,Ad Soyad,Mevcut Muayene,Sonraki Muayene\n";
+    
+    employees.forEach((employee, index) => {
+        csvContent += `${index + 1},${employee.tc},"${employee.name}",${employee.currentExam},${employee.nextExam}\n`;
+    });
+    
+    // Create download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${currentWorkplace.name}_calisan_listesi.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// Import from Excel
+function importFromExcel() {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.csv,.xlsx,.xls';
+    fileInput.onchange = function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            // In a real app, you would parse the Excel/CSV file
+            alert(`Excel dosyası yüklendi: ${file.name}\n(Bu örnekte gerçek içe aktarma işlemi yapılmamaktadır)`);
+        }
+    };
+    fileInput.click();
+}
+
+// Backup data
+function backupData() {
+    const data = {
+        workplaces,
+        doctorInfo
     };
     
-    input.click();
+    const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `isyeri_hekimligi_yedek_${new Date().toISOString().split('T')[0]}.json`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
-// Doktor Bilgilerini Yükle
-function loadDoctorInfo() {
-    if (doctorInfo.name) doctorName.value = doctorInfo.name;
-    if (doctorInfo.diplomaNo) diplomaNo.value = doctorInfo.diplomaNo;
-    if (doctorInfo.diplomaDate) diplomaDate.value = doctorInfo.diplomaDate;
-    if (doctorInfo.registrationNo) registrationNo.value = doctorInfo.registrationNo;
-    if (doctorInfo.registrationDate) registrationDate.value = doctorInfo.registrationDate;
-    if (doctorInfo.certificateNo) certificateNo.value = doctorInfo.certificateNo;
-    if (doctorInfo.certificateDate) certificateDate.value = doctorInfo.certificateDate;
-}
-
-// Verileri Kaydet
-function saveWorkplaces() {
-    localStorage.setItem('workplaces', JSON.stringify(workplaces));
-}
-
-function saveEmployees() {
-    localStorage.setItem('employees', JSON.stringify(employees));
+// Restore from backup
+function restoreFromBackup() {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.json';
+    fileInput.onchange = function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    workplaces = data.workplaces || [];
+                    doctorInfo = data.doctorInfo || {};
+                    
+                    saveData();
+                    updateWorkplaceList();
+                    
+                    // Update doctor info form
+                    document.getElementById('doctor-name').value = doctorInfo.name || '';
+                    document.getElementById('diploma-date').value = doctorInfo.diplomaDate || '';
+                    document.getElementById('diploma-reg-date').value = doctorInfo.diplomaRegDate || '';
+                    document.getElementById('workplace-certificate').value = doctorInfo.workplaceCertificate || '';
+                    
+                    alert('Yedek başarıyla geri yüklendi!');
+                } catch (error) {
+                    alert('Yedek dosyası okunurken hata oluştu: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+    };
+    fileInput.click();
 }
