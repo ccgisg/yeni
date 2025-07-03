@@ -3,95 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İşyeri Hekimliği Kayıt Programı</title>
+    <title>İşyeri Hekimliği Veri Kayıt</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
+    <div class="login-container" id="login-container">
+        <h2>İşyeri Hekimliği Sistemi</h2>
+        <input type="password" id="password" placeholder="Şifre (varsayılan: 1234)">
+        <button onclick="login()">Giriş Yap</button>
+    </div>
+
+    <div class="main-container" id="main-container" style="display: none;">
         <div class="sidebar">
-            <div class="menu-section">
-                <button id="monthlyTasksBtn" class="menu-btn">Aylık İşlerim ▼</button>
-                <div id="monthlyTasksDropdown" class="dropdown-content">
-                    <!-- JavaScript ile dinamik olarak doldurulacak -->
+            <div class="menu-item" id="monthly-jobs">
+                <span>Aylık İşlerim</span>
+                <div class="submenu" id="month-submenu"></div>
+            </div>
+            <div class="menu-item" id="workplaces">
+                <span>İşyerlerim</span>
+                <div class="submenu" id="workplace-submenu">
+                    <button onclick="addWorkplace()">İşyeri Ekle</button>
                 </div>
             </div>
-            
-            <div class="menu-section">
-                <h3>İşyerlerim</h3>
-                <div id="workplacesList">
-                    <!-- JavaScript ile dinamik olarak doldurulacak -->
-                </div>
-                <button id="addWorkplaceBtn" class="action-btn">İşyeri Ekle</button>
+            <div class="menu-item" onclick="showSettings()">
+                <span>Ayarlar</span>
             </div>
-            
-            <button id="settingsBtn" class="menu-btn settings-btn">Ayarla</button>
         </div>
-        
-        <div class="main-content">
+
+        <div class="content-area">
             <div class="header">
-                <button id="logoutBtn" class="logout-btn">Çıkış</button>
+                <button class="logout-btn" onclick="logout()">Çıkış</button>
             </div>
             
-            <div id="contentArea">
-                <h1>Hoş Geldiniz</h1>
-                <p>Soldaki menüden işyerlerinizi seçebilir veya yeni işyeri ekleyebilirsiniz.</p>
+            <div id="dashboard-content">
+                <h2>Hoş Geldiniz</h2>
+                <p>Sol menüden işlem yapmak istediğiniz bölümü seçiniz.</p>
             </div>
-        </div>
-    </div>
 
-    <!-- Modaller -->
-    <div id="loginModal" class="modal">
-        <div class="modal-content">
-            <h2>Giriş Yap</h2>
-            <input type="password" id="passwordInput" placeholder="Şifre">
-            <button id="loginBtn">Giriş</button>
-        </div>
-    </div>
-
-    <div id="workplaceModal" class="modal">
-        <div class="modal-content">
-            <h2 id="workplaceModalTitle">İşyeri Ekle</h2>
-            <input type="text" id="workplaceName" placeholder="İşyeri Adı">
-            <input type="text" id="workplaceSgkNo" placeholder="SGK Sicil No">
-            <input type="text" id="workplaceAddress" placeholder="Adres">
-            <input type="text" id="workplacePhone" placeholder="Telefon">
-            <input type="text" id="workplaceEmail" placeholder="E-posta">
-            <div class="modal-buttons">
-                <button id="saveWorkplaceBtn">Kaydet</button>
-                <button id="cancelWorkplaceBtn">İptal</button>
+            <div id="workplace-content" style="display: none;">
+                <button class="back-btn" onclick="backToMain()">← Geri</button>
+                <div class="workplace-header">
+                    <h2 id="workplace-title"></h2>
+                    <div class="workplace-actions">
+                        <button onclick="exportToExcel()">Excel'e Ver</button>
+                        <button onclick="importFromExcel()">Excel'den Al</button>
+                        <button onclick="backupData()">Yedek Al</button>
+                        <button onclick="restoreFromBackup()">Yedekten Dön</button>
+                    </div>
+                </div>
+                <table id="employee-table">
+                    <thead>
+                        <tr>
+                            <th>S.No</th>
+                            <th>TC Kimlik No</th>
+                            <th>Ad Soyad</th>
+                            <th>Mevcut Muayene</th>
+                            <th>Sonraki Muayene</th>
+                            <th>Ek-2</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employee-list">
+                        <!-- Employee list will be populated here -->
+                    </tbody>
+                </table>
+                <button onclick="addEmployee()" class="add-employee-btn">Kişi Ekle</button>
             </div>
-        </div>
-    </div>
 
-    <div id="employeeModal" class="modal">
-        <div class="modal-content">
-            <h2 id="employeeModalTitle">Çalışan Ekle/Düzenle</h2>
-            <input type="text" id="employeeTcNo" placeholder="TC Kimlik No">
-            <input type="text" id="employeeName" placeholder="Ad Soyad">
-            <input type="text" id="employeeBirthInfo" placeholder="Doğum Yeri ve Tarihi">
-            <input type="text" id="employeeGender" placeholder="Cinsiyet">
-            <input type="text" id="employeeLastExam" placeholder="Mevcut Muayene Tarihi">
-            <input type="text" id="employeeNextExam" placeholder="Sonraki Muayene Tarihi">
-            <div class="modal-buttons">
-                <button id="saveEmployeeBtn">Kaydet</button>
-                <button id="cancelEmployeeBtn">İptal</button>
+            <div id="settings-content" style="display: none;">
+                <button class="back-btn" onclick="backToMain()">← Geri</button>
+                <h2>Doktor Bilgileri</h2>
+                <form id="doctor-settings">
+                    <div class="form-group">
+                        <label for="doctor-name">Ad Soyad:</label>
+                        <input type="text" id="doctor-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="diploma-date">Diploma Tarih ve No:</label>
+                        <input type="text" id="diploma-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="diploma-reg-date">Diploma Tescil Tarih ve No:</label>
+                        <input type="text" id="diploma-reg-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="workplace-certificate">İşyeri Hekimliği Belgesi Tarih ve No:</label>
+                        <input type="text" id="workplace-certificate" required>
+                    </div>
+                    <button type="submit">Kaydet</button>
+                </form>
             </div>
-        </div>
-    </div>
 
-    <div id="settingsModal" class="modal">
-        <div class="modal-content">
-            <h2>Doktor Bilgileri</h2>
-            <input type="text" id="doctorName" placeholder="Ad Soyad">
-            <input type="text" id="diplomaNo" placeholder="Diploma No">
-            <input type="text" id="diplomaDate" placeholder="Diploma Tarihi">
-            <input type="text" id="registrationNo" placeholder="Tescil No">
-            <input type="text" id="registrationDate" placeholder="Tescil Tarihi">
-            <input type="text" id="certificateNo" placeholder="İşyeri Hekimliği Belge No">
-            <input type="text" id="certificateDate" placeholder="Belge Tarihi">
-            <div class="modal-buttons">
-                <button id="saveSettingsBtn">Kaydet</button>
-                <button id="cancelSettingsBtn">İptal</button>
+            <div id="employee-form-container" style="display: none;">
+                <button class="back-btn" onclick="backToWorkplace()">← Geri</button>
+                <h2 id="employee-form-title">Yeni Kişi Ekle</h2>
+                <form id="employee-form">
+                    <input type="hidden" id="employee-id">
+                    <div class="form-group">
+                        <label for="employee-tc">TC Kimlik No:</label>
+                        <input type="text" id="employee-tc" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="employee-name">Ad Soyad:</label>
+                        <input type="text" id="employee-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="current-exam">Mevcut Muayene Tarihi:</label>
+                        <input type="date" id="current-exam" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="next-exam">Sonraki Muayene Tarihi:</label>
+                        <input type="date" id="next-exam" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ek2-file">Ek-2 Dosyası:</label>
+                        <input type="file" id="ek2-file" accept=".docx,.pdf">
+                    </div>
+                    <button type="submit">Kaydet</button>
+                </form>
             </div>
         </div>
     </div>
