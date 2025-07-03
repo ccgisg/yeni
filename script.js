@@ -1,887 +1,554 @@
-// Temel veri yapıları
-let data = {
-    doctor: {
-        name: "",
-        diplomaNo: "",
-        diplomaDate: "",
-        certificateNo: "",
-        certificateDate: ""
-    },
-    workplaces: [],
-    monthlyDocuments: {},
-    currentWorkplace: null,
-    currentMonth: null
-};
+// Temel değişkenler
+let currentWorkplace = null;
+let workplaces = [];
+let people = [];
+let doctorInfo = {};
+let isMonthlyMenuOpen = false;
+const DEFAULT_PASSWORD = "1234"; // Basit bir şifre
 
-// DOM Elementleri
-const loginScreen = document.getElementById('loginScreen');
-const mainPage = document.getElementById('mainPage');
-const passwordInput = document.getElementById('passwordInput');
-const loginButton = document.getElementById('loginButton');
-const loginError = document.getElementById('loginError');
-const logoutButton = document.getElementById('logoutButton');
-const settingsBtn = document.getElementById('settingsBtn');
-const monthlyWorksBtn = document.getElementById('monthlyWorksBtn');
-const monthlyWorksMenu = document.getElementById('monthlyWorksMenu');
-const workplacesList = document.getElementById('workplacesList');
-const addWorkplaceBtn = document.getElementById('addWorkplaceBtn');
-const welcomeScreen = document.getElementById('welcomeScreen');
-const workplaceDetail = document.getElementById('workplaceDetail');
-const workplaceTitle = document.getElementById('workplaceTitle');
-const backToMainBtn = document.getElementById('backToMainBtn');
-const personsTable = document.getElementById('personsTable').getElementsByTagName('tbody')[0];
-const addPersonBtn = document.getElementById('addPersonBtn');
-const importExcelBtn = document.getElementById('importExcelBtn');
-const exportExcelBtn = document.getElementById('exportExcelBtn');
-const backupBtn = document.getElementById('backupBtn');
-const restoreBtn = document.getElementById('restoreBtn');
-const monthlyWorksDetail = document.getElementById('monthlyWorksDetail');
-const monthlyTitle = document.getElementById('monthlyTitle');
-const backFromMonthlyBtn = document.getElementById('backFromMonthlyBtn');
-const documentsList = document.querySelector('.documents-list');
-const settingsPage = document.getElementById('settingsPage');
-const backFromSettingsBtn = document.getElementById('backFromSettingsBtn');
-const doctorSettingsForm = document.getElementById('doctorSettingsForm');
-const doctorNameInput = document.getElementById('doctorName');
-const diplomaNoInput = document.getElementById('diplomaNo');
-const diplomaDateInput = document.getElementById('diplomaDate');
-const certificateNoInput = document.getElementById('certificateNo');
-const certificateDateInput = document.getElementById('certificateDate');
-const personModal = document.getElementById('personModal');
-const personModalTitle = document.getElementById('personModalTitle');
-const personForm = document.getElementById('personForm');
-const personIdInput = document.getElementById('personId');
-const personTCInput = document.getElementById('personTC');
-const personNameInput = document.getElementById('personName');
-const currentExamInput = document.getElementById('currentExam');
-const nextExamInput = document.getElementById('nextExam');
-const uploadModal = document.getElementById('uploadModal');
-const uploadForm = document.getElementById('uploadForm');
-const uploadPersonIdInput = document.getElementById('uploadPersonId');
-const fileInput = document.getElementById('fileInput');
-const ek2ListModal = document.getElementById('ek2ListModal');
-const ek2List = document.getElementById('ek2List');
-const workplaceModal = document.getElementById('workplaceModal');
-const workplaceModalTitle = document.getElementById('workplaceModalTitle');
-const workplaceForm = document.getElementById('workplaceForm');
-const workplaceIdInput = document.getElementById('workplaceId');
-const workplaceNameInput = document.getElementById('workplaceName');
+// DOM yüklendiğinde çalışacak fonksiyonlar
+document.addEventListener('DOMContentLoaded', function() {
+    // Şifre ekranı işlemleri
+    const passwordScreen = document.getElementById('passwordScreen');
+    const passwordInput = document.getElementById('passwordInput');
+    const loginBtn = document.getElementById('loginBtn');
+    const loginError = document.getElementById('loginError');
+    const mainApp = document.getElementById('mainApp');
 
-// Modal kapatma butonları
-const closeModalButtons = document.querySelectorAll('.close-modal');
-closeModalButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const modal = button.closest('.modal');
-        modal.classList.add('hidden');
+    // Şifre ekranını göster
+    passwordScreen.style.display = 'block';
+
+    // Giriş butonu event listener
+    loginBtn.addEventListener('click', function() {
+        if (passwordInput.value === DEFAULT_PASSWORD) {
+            passwordScreen.style.display = 'none';
+            mainApp.style.display = 'block';
+            initializeApp();
+        } else {
+            loginError.textContent = "Hatalı şifre! Lütfen tekrar deneyin.";
+        }
+    });
+
+    // Şifre alanında enter tuşuna basıldığında
+    passwordInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            loginBtn.click();
+        }
+    });
+
+    // Çıkış butonu event listener
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+        if (confirm('Çıkmak istediğinize emin misiniz?')) {
+            mainApp.style.display = 'none';
+            passwordScreen.style.display = 'block';
+            passwordInput.value = '';
+            loginError.textContent = '';
+        }
     });
 });
 
-// ESC tuşu ile modal kapatma
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        document.querySelectorAll('.modal:not(.hidden)').forEach(modal => {
-            if (modal.id !== 'loginScreen') {
-                modal.classList.add('hidden');
-            }
+// Uygulamayı başlatma fonksiyonu
+function initializeApp() {
+    // Klasör oluşturma işlemi (Electron veya başka bir yöntemle masaüstünde klasör oluşturulabilir)
+    // Bu örnekte sadece tarayıcıda çalışan bir simülasyon yapıyoruz
+    
+    // Doktor bilgilerini yükle
+    loadDoctorInfo();
+    
+    // İşyerlerini yükle
+    loadWorkplaces();
+    
+    // Aylık işler menüsünü başlat
+    initializeMonths();
+    
+    // Event listener'ları ekle
+    setupEventListeners();
+}
+
+// Doktor bilgilerini yükle
+function loadDoctorInfo() {
+    const savedInfo = localStorage.getItem('doctorInfo');
+    if (savedInfo) {
+        doctorInfo = JSON.parse(savedInfo);
+        // Formu doldur
+        document.getElementById('doctorName').value = doctorInfo.name || '';
+        document.getElementById('diplomaNo').value = doctorInfo.diplomaNo || '';
+        document.getElementById('diplomaDate').value = doctorInfo.diplomaDate || '';
+        document.getElementById('certificateNo').value = doctorInfo.certificateNo || '';
+        document.getElementById('certificateDate').value = doctorInfo.certificateDate || '';
+    }
+}
+
+// İşyerlerini yükle
+function loadWorkplaces() {
+    const savedWorkplaces = localStorage.getItem('workplaces');
+    if (savedWorkplaces) {
+        workplaces = JSON.parse(savedWorkplaces);
+        renderWorkplacesList();
+    }
+}
+
+// Aylık işler menüsünü başlat
+function initializeMonths() {
+    const monthlyWorksMenu = document.getElementById('monthlyWorksMenu');
+    if (!monthlyWorksMenu) {
+        console.error("Monthly works menu element not found!");
+        return;
+    }
+
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    const currentDay = now.getDate();
+    
+    // 15'inden sonra bir sonraki ayı da ekle
+    const monthsToShow = currentDay > 15 ? 13 : 12;
+    
+    monthlyWorksMenu.innerHTML = '';
+    
+    for (let i = 0; i < monthsToShow; i++) {
+        const date = new Date(currentYear, currentMonth + i, 1);
+        const monthName = getMonthName(date.getMonth());
+        const year = date.getFullYear();
+        
+        const monthElement = document.createElement('div');
+        monthElement.className = 'month-item';
+        monthElement.textContent = `${monthName} ${year}`;
+        monthElement.dataset.month = date.getMonth();
+        monthElement.dataset.year = year;
+        
+        monthElement.addEventListener('click', function() {
+            openMonthlyDocuments(monthName, year);
         });
+        
+        monthlyWorksMenu.appendChild(monthElement);
     }
-});
+}
 
-// Şifre kontrolü (basit şifre: "1234")
-const PASSWORD = "1234";
-
-// Giriş işlemi
-loginButton.addEventListener('click', () => {
-    if (passwordInput.value === PASSWORD) {
-        loginError.textContent = "";
-        loginScreen.classList.add('hidden');
-        mainPage.classList.remove('hidden');
-        loadData();
-        initializeMonths();
-        renderWorkplaces();
-    } else {
-        loginError.textContent = "Hatalı şifre! Lütfen tekrar deneyin.";
-    }
-});
-
-// Çıkış işlemi
-logoutButton.addEventListener('click', () => {
-    mainPage.classList.add('hidden');
-    loginScreen.classList.remove('hidden');
-    passwordInput.value = "";
-});
-
-// Ayarlar sayfasına git
-settingsBtn.addEventListener('click', () => {
-    welcomeScreen.classList.add('hidden');
-    workplaceDetail.classList.add('hidden');
-    monthlyWorksDetail.classList.add('hidden');
-    settingsPage.classList.remove('hidden');
-    
-    // Doktor bilgilerini formda göster
-    doctorNameInput.value = data.doctor.name;
-    diplomaNoInput.value = data.doctor.diplomaNo;
-    diplomaDateInput.value = data.doctor.diplomaDate;
-    certificateNoInput.value = data.doctor.certificateNo;
-    certificateDateInput.value = data.doctor.certificateDate;
-});
-
-// Doktor bilgilerini kaydet
-doctorSettingsForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    // Tarih formatını kontrol et
-    if (!isValidDate(diplomaDateInput.value) {
-        alert("Geçersiz diploma tarihi formatı! gg.aa.yyyy şeklinde girin.");
-        return;
-    }
-    
-    if (!isValidDate(certificateDateInput.value)) {
-        alert("Geçersiz belge tarihi formatı! gg.aa.yyyy şeklinde girin.");
-        return;
-    }
-    
-    data.doctor = {
-        name: doctorNameInput.value,
-        diplomaNo: diplomaNoInput.value,
-        diplomaDate: diplomaDateInput.value,
-        certificateNo: certificateNoInput.value,
-        certificateDate: certificateDateInput.value
-    };
-    
-    saveData();
-    alert("Doktor bilgileri kaydedildi!");
-});
-
-// Aylık işler menüsünü aç/kapat
-monthlyWorksBtn.addEventListener('click', () => {
-    monthlyWorksMenu.classList.toggle('hidden');
-});
-
-// İşyeri ekle butonu
-addWorkplaceBtn.addEventListener('click', () => {
-    workplaceModalTitle.textContent = "İşyeri Ekle";
-    workplaceIdInput.value = "";
-    workplaceNameInput.value = "";
-    workplaceModal.classList.remove('hidden');
-});
-
-// İşyeri formu
-workplaceForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    const workplaceName = workplaceNameInput.value.trim();
-    if (!workplaceName) {
-        alert("İşyeri adı boş olamaz!");
-        return;
-    }
-    
-    const workplaceId = workplaceIdInput.value || Date.now().toString();
-    
-    if (workplaceIdInput.value) {
-        // Düzenleme
-        const index = data.workplaces.findIndex(w => w.id === workplaceId);
-        if (index !== -1) {
-            data.workplaces[index].name = workplaceName;
-        }
-    } else {
-        // Ekleme
-        data.workplaces.push({
-            id: workplaceId,
-            name: workplaceName,
-            persons: []
-        });
-    }
-    
-    saveData();
-    renderWorkplaces();
-    workplaceModal.classList.add('hidden');
-});
+// Ay ismini al
+function getMonthName(monthIndex) {
+    const months = [
+        'OCAK', 'ŞUBAT', 'MART', 'NİSAN', 'MAYIS', 'HAZİRAN',
+        'TEMMUZ', 'AĞUSTOS', 'EYLÜL', 'EKİM', 'KASIM', 'ARALIK'
+    ];
+    return months[monthIndex];
+}
 
 // İşyerlerini listele
-function renderWorkplaces() {
-    workplacesList.innerHTML = "";
+function renderWorkplacesList() {
+    const workplacesList = document.getElementById('workplacesList');
+    workplacesList.innerHTML = '';
     
-    data.workplaces.forEach(workplace => {
-        const workplaceItem = document.createElement('div');
-        workplaceItem.className = 'workplace-item';
-        workplaceItem.textContent = workplace.name;
-        workplaceItem.dataset.id = workplace.id;
+    workplaces.forEach((workplace, index) => {
+        const workplaceElement = document.createElement('div');
+        workplaceElement.className = 'workplace-item';
+        workplaceElement.textContent = workplace.name;
+        workplaceElement.dataset.id = workplace.id;
         
-        workplaceItem.addEventListener('dblclick', () => {
+        workplaceElement.addEventListener('dblclick', function() {
             openWorkplace(workplace.id);
         });
         
-        // Sağ tık menüsü (düzenle/sil)
-        workplaceItem.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-            
-            const menu = document.createElement('div');
-            menu.style.position = 'absolute';
-            menu.style.left = `${e.clientX}px`;
-            menu.style.top = `${e.clientY}px`;
-            menu.style.backgroundColor = 'white';
-            menu.style.border = '1px solid #ddd';
-            menu.style.borderRadius = '4px';
-            menu.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
-            menu.style.zIndex = '1000';
-            
-            const editBtn = document.createElement('button');
-            editBtn.textContent = 'Düzenle';
-            editBtn.style.display = 'block';
-            editBtn.style.width = '100%';
-            editBtn.style.padding = '8px';
-            editBtn.style.textAlign = 'left';
-            editBtn.style.border = 'none';
-            editBtn.style.background = 'none';
-            editBtn.style.cursor = 'pointer';
-            
-            editBtn.addEventListener('click', () => {
-                const workplace = data.workplaces.find(w => w.id === workplaceItem.dataset.id);
-                if (workplace) {
-                    workplaceModalTitle.textContent = "İşyeri Düzenle";
-                    workplaceIdInput.value = workplace.id;
-                    workplaceNameInput.value = workplace.name;
-                    workplaceModal.classList.remove('hidden');
-                }
-                document.body.removeChild(menu);
-            });
-            
-            const deleteBtn = document.createElement('button');
-            deleteBtn.textContent = 'Sil';
-            deleteBtn.style.display = 'block';
-            deleteBtn.style.width = '100%';
-            deleteBtn.style.padding = '8px';
-            deleteBtn.style.textAlign = 'left';
-            deleteBtn.style.border = 'none';
-            deleteBtn.style.background = 'none';
-            deleteBtn.style.cursor = 'pointer';
-            deleteBtn.style.color = 'red';
-            
-            deleteBtn.addEventListener('click', () => {
-                if (confirm(`${workplace.name} işyerini silmek istediğinize emin misiniz?`)) {
-                    data.workplaces = data.workplaces.filter(w => w.id !== workplaceItem.dataset.id);
-                    saveData();
-                    renderWorkplaces();
-                    
-                    // Eğer silinen işyeri açıksa, ana sayfaya dön
-                    if (currentWorkplace === workplaceItem.dataset.id) {
-                        workplaceDetail.classList.add('hidden');
-                        welcomeScreen.classList.remove('hidden');
-                        currentWorkplace = null;
-                    }
-                }
-                document.body.removeChild(menu);
-            });
-            
-            menu.appendChild(editBtn);
-            menu.appendChild(deleteBtn);
-            document.body.appendChild(menu);
-            
-            // Menü dışına tıklandığında menüyü kaldır
-            const closeMenu = (e) => {
-                if (!menu.contains(e.target)) {
-                    document.body.removeChild(menu);
-                    document.removeEventListener('click', closeMenu);
-                }
-            };
-            
-            setTimeout(() => {
-                document.addEventListener('click', closeMenu);
-            }, 0);
+        // Düzenle ve sil butonları
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'workplace-actions';
+        
+        const editBtn = document.createElement('button');
+        editBtn.textContent = 'Düzenle';
+        editBtn.className = 'edit-btn';
+        editBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            editWorkplace(index);
         });
         
-        workplacesList.appendChild(workplaceItem);
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Sil';
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            deleteWorkplace(index);
+        });
+        
+        actionsDiv.appendChild(editBtn);
+        actionsDiv.appendChild(deleteBtn);
+        workplaceElement.appendChild(actionsDiv);
+        
+        workplacesList.appendChild(workplaceElement);
     });
 }
 
 // İşyeri aç
 function openWorkplace(workplaceId) {
-    const workplace = data.workplaces.find(w => w.id === workplaceId);
-    if (!workplace) return;
+    currentWorkplace = workplaces.find(w => w.id === workplaceId);
+    if (!currentWorkplace) return;
     
-    currentWorkplace = workplaceId;
-    workplaceTitle.textContent = workplace.name;
+    document.getElementById('workplaceTitle').textContent = currentWorkplace.name;
+    document.getElementById('welcomeScreen').style.display = 'none';
+    document.getElementById('workplaceContent').style.display = 'block';
+    document.getElementById('settingsContent').style.display = 'none';
+    document.getElementById('monthlyDocumentsContent').style.display = 'none';
     
-    welcomeScreen.classList.add('hidden');
-    workplaceDetail.classList.remove('hidden');
-    
-    renderPersonsTable();
+    // Kişileri yükle
+    loadPeople(workplaceId);
 }
 
-// Geri butonu (işyeri detayından ana sayfaya)
-backToMainBtn.addEventListener('click', () => {
-    workplaceDetail.classList.add('hidden');
-    welcomeScreen.classList.remove('hidden');
-    currentWorkplace = null;
-});
+// Kişileri yükle
+function loadPeople(workplaceId) {
+    const savedPeople = localStorage.getItem(`people_${workplaceId}`);
+    people = savedPeople ? JSON.parse(savedPeople) : [];
+    renderPeopleTable();
+}
 
-// Kişi listesini render et
-function renderPersonsTable() {
-    const workplace = data.workplaces.find(w => w.id === currentWorkplace);
-    if (!workplace) return;
+// Kişi tablosunu oluştur
+function renderPeopleTable() {
+    const tableBody = document.querySelector('#peopleTable tbody');
+    tableBody.innerHTML = '';
     
-    personsTable.innerHTML = "";
-    
-    workplace.persons.forEach((person, index) => {
-        const row = personsTable.insertRow();
+    people.forEach((person, index) => {
+        const row = document.createElement('tr');
         
         // S.No
-        const cellNo = row.insertCell();
-        cellNo.textContent = index + 1;
+        const snoCell = document.createElement('td');
+        snoCell.textContent = index + 1;
+        row.appendChild(snoCell);
         
         // TC Kimlik No
-        const cellTC = row.insertCell();
-        cellTC.textContent = person.tc;
+        const tcCell = document.createElement('td');
+        tcCell.textContent = person.tc;
+        row.appendChild(tcCell);
         
         // Ad Soyad
-        const cellName = row.insertCell();
-        cellName.textContent = person.name;
+        const nameCell = document.createElement('td');
+        nameCell.textContent = person.name;
+        row.appendChild(nameCell);
         
-        // Mevcut Muayene
-        const cellCurrentExam = row.insertCell();
-        cellCurrentExam.textContent = person.currentExam;
+        // Mevcut Muayene Tarihi
+        const currentDateCell = document.createElement('td');
+        currentDateCell.textContent = person.currentExamDate;
+        row.appendChild(currentDateCell);
         
-        // Sonraki Muayene
-        const cellNextExam = row.insertCell();
-        cellNextExam.textContent = person.nextExam;
+        // Sonraki Muayene Tarihi
+        const nextDateCell = document.createElement('td');
+        nextDateCell.textContent = person.nextExamDate;
+        row.appendChild(nextDateCell);
+        
+        // İşlemler
+        const actionsCell = document.createElement('td');
         
         // Ek-2 Butonu
-        const cellEk2 = row.insertCell();
         const ek2Btn = document.createElement('button');
         ek2Btn.textContent = 'Ek-2';
         ek2Btn.className = 'action-btn ek2-btn';
-        ek2Btn.addEventListener('click', () => generateEk2(person));
-        cellEk2.appendChild(ek2Btn);
-        
-        // Ek-2 Yükle Butonu
-        const cellUpload = row.insertCell();
-        const uploadBtn = document.createElement('button');
-        uploadBtn.textContent = 'Yükle';
-        uploadBtn.className = 'action-btn ek2-btn';
-        uploadBtn.addEventListener('click', () => {
-            uploadPersonIdInput.value = person.id;
-            uploadModal.classList.remove('hidden');
+        ek2Btn.addEventListener('click', function() {
+            generateEk2Document(person);
         });
-        cellUpload.appendChild(uploadBtn);
         
         // Ek-2 Göster Butonu
-        const cellShow = row.insertCell();
-        const showBtn = document.createElement('button');
-        showBtn.textContent = 'Göster';
-        showBtn.className = 'action-btn ek2-btn';
-        showBtn.addEventListener('click', () => showEk2List(person.id));
-        cellShow.appendChild(showBtn);
+        const showEk2Btn = document.createElement('button');
+        showEk2Btn.textContent = 'Ek-2 Göster';
+        showEk2Btn.className = 'action-btn ek2-btn';
+        showEk2Btn.addEventListener('click', function() {
+            showEk2Documents(person.tc);
+        });
         
         // Düzenle Butonu
-        const cellEdit = row.insertCell();
         const editBtn = document.createElement('button');
         editBtn.textContent = 'Düzenle';
         editBtn.className = 'action-btn edit-btn';
-        editBtn.addEventListener('click', () => editPerson(person.id));
-        cellEdit.appendChild(editBtn);
+        editBtn.addEventListener('click', function() {
+            editPerson(index);
+        });
         
         // Sil Butonu
-        const cellDelete = row.insertCell();
         const deleteBtn = document.createElement('button');
         deleteBtn.textContent = 'Sil';
         deleteBtn.className = 'action-btn delete-btn';
-        deleteBtn.addEventListener('click', () => deletePerson(person.id));
-        cellDelete.appendChild(deleteBtn);
+        deleteBtn.addEventListener('click', function() {
+            deletePerson(index);
+        });
+        
+        actionsCell.appendChild(ek2Btn);
+        actionsCell.appendChild(showEk2Btn);
+        actionsCell.appendChild(editBtn);
+        actionsCell.appendChild(deleteBtn);
+        row.appendChild(actionsCell);
+        
+        tableBody.appendChild(row);
     });
 }
 
-// Kişi ekle butonu
-addPersonBtn.addEventListener('click', () => {
-    personModalTitle.textContent = "Kişi Ekle";
-    personIdInput.value = "";
-    personTCInput.value = "";
-    personNameInput.value = "";
-    currentExamInput.value = "";
-    nextExamInput.value = "";
-    personModal.classList.remove('hidden');
-});
-
-// Kişi formu
-personForm.addEventListener('submit', (e) => {
-    e.preventDefault();
+// Aylık belgeleri aç
+function openMonthlyDocuments(monthName, year) {
+    document.getElementById('monthlyTitle').textContent = `${monthName} ${year} Belgeleri`;
+    document.getElementById('welcomeScreen').style.display = 'none';
+    document.getElementById('workplaceContent').style.display = 'none';
+    document.getElementById('settingsContent').style.display = 'none';
+    document.getElementById('monthlyDocumentsContent').style.display = 'block';
     
-    const workplace = data.workplaces.find(w => w.id === currentWorkplace);
-    if (!workplace) return;
+    const documentsList = document.getElementById('monthlyDocumentsList');
+    documentsList.innerHTML = '';
     
-    const tc = personTCInput.value.trim();
-    const name = personNameInput.value.trim();
-    const currentExam = currentExamInput.value.trim();
-    const nextExam = nextExamInput.value.trim();
+    const documents = [
+        'Çasmer Mutabakat.docx',
+        'Çasmer Puantaj.xlsx',
+        'Genel Hijyen ve Saha Denetim Formu.xlsx',
+        'Mutfak Hijyen Denetim Formu.xlsx',
+        'Tuvalet Hijyen Denetim Formu.xlsx'
+    ];
     
-    if (!tc || !name || !currentExam || !nextExam) {
-        alert("Tüm alanları doldurunuz!");
-        return;
-    }
-    
-    if (!isValidDate(currentExam)) {
-        alert("Geçersiz mevcut muayene tarihi formatı! gg.aa.yyyy şeklinde girin.");
-        return;
-    }
-    
-    if (!isValidDate(nextExam)) {
-        alert("Geçersiz sonraki muayene tarihi formatı! gg.aa.yyyy şeklinde girin.");
-        return;
-    }
-    
-    const personId = personIdInput.value || Date.now().toString();
-    
-    if (personIdInput.value) {
-        // Düzenleme
-        const index = workplace.persons.findIndex(p => p.id === personId);
-        if (index !== -1) {
-            workplace.persons[index] = {
-                id: personId,
-                tc,
-                name,
-                currentExam,
-                nextExam,
-                ek2Files: workplace.persons[index].ek2Files || []
-            };
-        }
-    } else {
-        // Ekleme
-        workplace.persons.push({
-            id: personId,
-            tc,
-            name,
-            currentExam,
-            nextExam,
-            ek2Files: []
+    documents.forEach(doc => {
+        const docElement = document.createElement('div');
+        docElement.className = 'document-card';
+        
+        const docTitle = document.createElement('h3');
+        docTitle.textContent = `${monthName} ${year} ${doc}`;
+        docElement.appendChild(docTitle);
+        
+        const docInfo = document.createElement('p');
+        docInfo.textContent = `Son güncelleme: ${new Date().toLocaleDateString()}`;
+        docElement.appendChild(docInfo);
+        
+        docElement.addEventListener('click', function() {
+            // Burada belge açma işlemi simüle ediliyor
+            alert(`${monthName} ${year} ${doc} belgesi açılıyor...`);
         });
+        
+        documentsList.appendChild(docElement);
+    });
+}
+
+// Ek-2 belgesi oluştur
+function generateEk2Document(person) {
+    // Burada gerçekte ccgisg_ek_2.docx dosyasını açıp düzenlemek gerekir
+    // Simülasyon olarak bir uyarı gösteriyoruz
+    alert(`Ek-2 belgesi oluşturuluyor:\nTC: ${person.tc}\nAd Soyad: ${person.name}`);
+    
+    // Masaüstüne kaydetme işlemi (simülasyon)
+    const fileName = `Ek2_${person.tc}_${person.name.replace(/\s+/g, '_')}.docx`;
+    console.log(`Belge ${fileName} olarak kaydedildi.`);
+}
+
+// Ek-2 belgelerini göster
+function showEk2Documents(tc) {
+    const ek2ListModal = document.getElementById('ek2ListModal');
+    const ek2DocumentsList = document.getElementById('ek2DocumentsList');
+    
+    // Burada gerçekte dosya sisteminden belgeleri okumak gerekir
+    // Simülasyon olarak birkaç örnek belge gösteriyoruz
+    ek2DocumentsList.innerHTML = '';
+    
+    for (let i = 1; i <= 3; i++) {
+        const docElement = document.createElement('div');
+        docElement.className = 'document-card';
+        docElement.textContent = `Ek2_${tc}_${i}.docx`;
+        
+        docElement.addEventListener('dblclick', function() {
+            alert(`Belge açılıyor: Ek2_${tc}_${i}.docx`);
+        });
+        
+        ek2DocumentsList.appendChild(docElement);
     }
     
-    saveData();
-    renderPersonsTable();
-    personModal.classList.add('hidden');
-});
+    ek2ListModal.style.display = 'block';
+}
+
+// Event listener'ları kur
+function setupEventListeners() {
+    // Aylık işler butonu
+    document.getElementById('monthlyWorksBtn').addEventListener('click', function() {
+        const monthlyWorksMenu = document.getElementById('monthlyWorksMenu');
+        isMonthlyMenuOpen = !isMonthlyMenuOpen;
+        monthlyWorksMenu.style.display = isMonthlyMenuOpen ? 'block' : 'none';
+    });
+    
+    // İşyeri ekle butonu
+    document.getElementById('addWorkplaceBtn').addEventListener('click', function() {
+        const workplaceName = prompt('İşyeri adını girin:');
+        if (workplaceName && workplaceName.trim() !== '') {
+            const newWorkplace = {
+                id: Date.now().toString(),
+                name: workplaceName.trim()
+            };
+            workplaces.push(newWorkplace);
+            saveWorkplaces();
+            renderWorkplacesList();
+        }
+    });
+    
+    // Geri butonları
+    document.getElementById('backToMainBtn').addEventListener('click', function() {
+        document.getElementById('welcomeScreen').style.display = 'block';
+        document.getElementById('workplaceContent').style.display = 'none';
+        currentWorkplace = null;
+    });
+    
+    document.getElementById('backFromMonthlyBtn').addEventListener('click', function() {
+        document.getElementById('welcomeScreen').style.display = 'block';
+        document.getElementById('monthlyDocumentsContent').style.display = 'none';
+    });
+    
+    document.getElementById('backFromSettingsBtn').addEventListener('click', function() {
+        document.getElementById('welcomeScreen').style.display = 'block';
+        document.getElementById('settingsContent').style.display = 'none';
+    });
+    
+    // Ayarlar butonu
+    document.getElementById('settingsBtn').addEventListener('click', function() {
+        document.getElementById('welcomeScreen').style.display = 'none';
+        document.getElementById('workplaceContent').style.display = 'none';
+        document.getElementById('monthlyDocumentsContent').style.display = 'none';
+        document.getElementById('settingsContent').style.display = 'block';
+    });
+    
+    // Doktor bilgileri formu
+    document.getElementById('doctorInfoForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        doctorInfo = {
+            name: document.getElementById('doctorName').value,
+            diplomaNo: document.getElementById('diplomaNo').value,
+            diplomaDate: document.getElementById('diplomaDate').value,
+            certificateNo: document.getElementById('certificateNo').value,
+            certificateDate: document.getElementById('certificateDate').value
+        };
+        
+        localStorage.setItem('doctorInfo', JSON.stringify(doctorInfo));
+        alert('Doktor bilgileri kaydedildi!');
+    });
+    
+    // Kişi ekle butonu
+    document.getElementById('addPersonBtn').addEventListener('click', function() {
+        if (!currentWorkplace) return;
+        
+        const personModal = document.getElementById('personModal');
+        document.getElementById('personModalTitle').textContent = 'Kişi Ekle';
+        document.getElementById('personId').value = '';
+        document.getElementById('personTC').value = '';
+        document.getElementById('personName').value = '';
+        document.getElementById('currentExamDate').value = '';
+        document.getElementById('nextExamDate').value = '';
+        
+        personModal.style.display = 'block';
+    });
+    
+    // Kişi formu
+    document.getElementById('personForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const personId = document.getElementById('personId').value;
+        const personData = {
+            tc: document.getElementById('personTC').value,
+            name: document.getElementById('personName').value,
+            currentExamDate: document.getElementById('currentExamDate').value,
+            nextExamDate: document.getElementById('nextExamDate').value
+        };
+        
+        if (personId) {
+            // Düzenleme
+            const index = people.findIndex(p => p.id === personId);
+            if (index !== -1) {
+                people[index] = { ...people[index], ...personData };
+            }
+        } else {
+            // Ekleme
+            personData.id = Date.now().toString();
+            people.push(personData);
+        }
+        
+        savePeople();
+        renderPeopleTable();
+        document.getElementById('personModal').style.display = 'none';
+    });
+    
+    // Modal kapatma butonları
+    document.querySelectorAll('.close-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.closest('.modal').style.display = 'none';
+        });
+    });
+    
+    // ESC tuşu ile modal kapatma
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal').forEach(modal => {
+                if (modal.style.display === 'block') {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+    });
+    
+    // Excel işlemleri (simülasyon)
+    document.getElementById('importExcelBtn').addEventListener('click', function() {
+        alert('Excel\'den veri alınacak (simülasyon)');
+    });
+    
+    document.getElementById('exportExcelBtn').addEventListener('click', function() {
+        alert('Excel\'e veri aktarılacak (simülasyon)');
+    });
+    
+    // Yedekleme işlemleri (simülasyon)
+    document.getElementById('backupBtn').addEventListener('click', function() {
+        alert('Yedek alınıyor (simülasyon)');
+    });
+    
+    document.getElementById('restoreBtn').addEventListener('click', function() {
+        alert('Yedekten dönülüyor (simülasyon)');
+    });
+}
+
+// İşyerlerini kaydet
+function saveWorkplaces() {
+    localStorage.setItem('workplaces', JSON.stringify(workplaces));
+}
+
+// Kişileri kaydet
+function savePeople() {
+    if (!currentWorkplace) return;
+    localStorage.setItem(`people_${currentWorkplace.id}`, JSON.stringify(people));
+}
+
+// İşyeri düzenle
+function editWorkplace(index) {
+    const newName = prompt('Yeni işyeri adını girin:', workplaces[index].name);
+    if (newName && newName.trim() !== '') {
+        workplaces[index].name = newName.trim();
+        saveWorkplaces();
+        renderWorkplacesList();
+    }
+}
+
+// İşyeri sil
+function deleteWorkplace(index) {
+    if (confirm(`"${workplaces[index].name}" işyerini silmek istediğinize emin misiniz?`)) {
+        // İlgili kişileri de sil
+        localStorage.removeItem(`people_${workplaces[index].id}`);
+        workplaces.splice(index, 1);
+        saveWorkplaces();
+        renderWorkplacesList();
+    }
+}
 
 // Kişi düzenle
-function editPerson(personId) {
-    const workplace = data.workplaces.find(w => w.id === currentWorkplace);
-    if (!workplace) return;
+function editPerson(index) {
+    const person = people[index];
+    const personModal = document.getElementById('personModal');
     
-    const person = workplace.persons.find(p => p.id === personId);
-    if (!person) return;
+    document.getElementById('personModalTitle').textContent = 'Kişi Düzenle';
+    document.getElementById('personId').value = person.id;
+    document.getElementById('personTC').value = person.tc;
+    document.getElementById('personName').value = person.name;
+    document.getElementById('currentExamDate').value = person.currentExamDate;
+    document.getElementById('nextExamDate').value = person.nextExamDate;
     
-    personModalTitle.textContent = "Kişi Düzenle";
-    personIdInput.value = person.id;
-    personTCInput.value = person.tc;
-    personNameInput.value = person.name;
-    currentExamInput.value = person.currentExam;
-    nextExamInput.value = person.nextExam;
-    personModal.classList.remove('hidden');
+    personModal.style.display = 'block';
 }
 
 // Kişi sil
-function deletePerson(personId) {
-    const workplace = data.workplaces.find(w => w.id === currentWorkplace);
-    if (!workplace) return;
-    
-    const person = workplace.persons.find(p => p.id === personId);
-    if (!person) return;
-    
-    if (confirm(`${person.name} isimli kişiyi silmek istediğinize emin misiniz?`)) {
-        workplace.persons = workplace.persons.filter(p => p.id !== personId);
-        saveData();
-        renderPersonsTable();
+function deletePerson(index) {
+    if (confirm(`"${people[index].name}" kişisini silmek istediğinize emin misiniz?`)) {
+        people.splice(index, 1);
+        savePeople();
+        renderPeopleTable();
     }
 }
-
-// Ek-2 yükle formu
-uploadForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    const workplace = data.workplaces.find(w => w.id === currentWorkplace);
-    if (!workplace) return;
-    
-    const person = workplace.persons.find(p => p.id === uploadPersonIdInput.value);
-    if (!person) return;
-    
-    const file = fileInput.files[0];
-    if (!file) {
-        alert("Lütfen bir dosya seçin!");
-        return;
-    }
-    
-    if (!file.name.endsWith('.docx')) {
-        alert("Sadece .docx uzantılı dosyalar yüklenebilir!");
-        return;
-    }
-    
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const fileData = e.target.result;
-        
-        if (!person.ek2Files) {
-            person.ek2Files = [];
-        }
-        
-        person.ek2Files.push({
-            name: file.name,
-            data: fileData,
-            date: formatDate(new Date())
-        });
-        
-        saveData();
-        alert("Ek-2 başarıyla yüklendi!");
-        uploadModal.classList.add('hidden');
-        fileInput.value = "";
-    };
-    
-    reader.readAsDataURL(file);
-});
-
-// Ek-2 listesini göster
-function showEk2List(personId) {
-    const workplace = data.workplaces.find(w => w.id === currentWorkplace);
-    if (!workplace) return;
-    
-    const person = workplace.persons.find(p => p.id === personId);
-    if (!person) return;
-    
-    ek2List.innerHTML = "";
-    
-    if (!person.ek2Files || person.ek2Files.length === 0) {
-        ek2List.innerHTML = "<p>Bu kişi için yüklenmiş Ek-2 bulunmamaktadır.</p>";
-    } else {
-        person.ek2Files.forEach((file, index) => {
-            const fileItem = document.createElement('div');
-            fileItem.className = 'document-item';
-            fileItem.textContent = `${index + 1}. ${file.name} (${file.date})`;
-            
-            fileItem.addEventListener('dblclick', () => {
-                // Burada dosyayı görüntüleme işlemi yapılabilir
-                // Basit bir örnek olarak yeni pencerede açalım
-                const blob = dataURLtoBlob(file.data);
-                const url = URL.createObjectURL(blob);
-                window.open(url, '_blank');
-            });
-            
-            ek2List.appendChild(fileItem);
-        });
-    }
-    
-    ek2ListModal.classList.remove('hidden');
-}
-
-// Ek-2 oluştur
-function generateEk2(person) {
-    // Burada gerçek bir .docx oluşturma işlemi yapılmalı
-    // Örnek olarak bir blob oluşturup indirme bağlantısı sağlıyoruz
-    
-    const workplace = data.workplaces.find(w => w.id === currentWorkplace);
-    if (!workplace) return;
-    
-    // Basit bir örnek - gerçekte docx oluşturmak için bir kütüphane kullanılmalı
-    const content = `
-        İŞYERİNİN
-        Ünvanı: ${workplace.name}
-        
-        ÇALIŞANIN
-        Adı ve soyadı: ${person.name}
-        T.C.Kimlik No: ${person.tc}
-        
-        ... (ccgisg_ek_2.docx içeriği buraya gelecek)
-    `;
-    
-    const blob = new Blob([content], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-    const url = URL.createObjectURL(blob);
-    
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Ek-2_${person.name.replace(/\s+/g, '_')}_${person.tc}.docx`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
-
-// Excel'den al
-importExcelBtn.addEventListener('click', () => {
-    alert("Excel'den veri alma işlemi bu örnekte simüle edilmiştir. Gerçek uygulamada bir Excel parser kullanılmalıdır.");
-    
-    // Örnek veri
-    const exampleData = [
-        { tc: "12345678901", name: "Örnek Kişi 1", currentExam: "01.01.2025", nextExam: "01.07.2025" },
-        { tc: "98765432109", name: "Örnek Kişi 2", currentExam: "15.01.2025", nextExam: "15.07.2025" }
-    ];
-    
-    const workplace = data.workplaces.find(w => w.id === currentWorkplace);
-    if (!workplace) return;
-    
-    workplace.persons = exampleData.map(person => ({
-        id: Date.now().toString() + Math.floor(Math.random() * 1000),
-        tc: person.tc,
-        name: person.name,
-        currentExam: person.currentExam,
-        nextExam: person.nextExam,
-        ek2Files: []
-    }));
-    
-    saveData();
-    renderPersonsTable();
-    alert("Örnek veri başarıyla yüklendi!");
-});
-
-// Excel'e ver
-exportExcelBtn.addEventListener('click', () => {
-    const workplace = data.workplaces.find(w => w.id === currentWorkplace);
-    if (!workplace) return;
-    
-    // CSV formatında basit bir örnek oluşturuyoruz
-    let csvContent = "S.No,TC Kimlik No,Ad Soyad,Mevcut Muayene,Sonraki Muayene\n";
-    
-    workplace.persons.forEach((person, index) => {
-        csvContent += `${index + 1},${person.tc},"${person.name}",${person.currentExam},${person.nextExam}\n`;
-    });
-    
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${workplace.name.replace(/\s+/g, '_')}_Personel_Listesi.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-});
-
-// Yedek al
-backupBtn.addEventListener('click', () => {
-    const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `isyeri_hekimligi_yedek_${formatDate(new Date(), true)}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-});
-
-// Yedekten dön
-restoreBtn.addEventListener('click', () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-    
-    input.onchange = e => {
-        const file = e.target.files[0];
-        if (!file) return;
-        
-        const reader = new FileReader();
-        reader.onload = event => {
-            try {
-                const backupData = JSON.parse(event.target.result);
-                data = backupData;
-                saveData();
-                
-                // UI'ı güncelle
-                if (currentWorkplace) {
-                    renderPersonsTable();
-                }
-                
-                renderWorkplaces();
-                alert("Yedek başarıyla yüklendi!");
-            } catch (error) {
-                alert("Yedek dosyası geçersiz: " + error.message);
-            }
-        };
-        
-        reader.readAsText(file);
-    };
-    
-    input.click();
-});
-
-// Ayları başlat
-function initializeMonths() {
-    // DOM elementinin yüklendiğinden emin ol
-    if (!monthlyWorksMenu) {
-        setTimeout(initializeMonths, 100);
-        return;
-    }
-    
-    monthlyWorksMenu.innerHTML = "";
-    
-    const now = new Date();
-    let year = now.getFullYear();
-    let month = now.getMonth();
-    
-    // Eğer ayın 15'inden sonraysa bir sonraki ayı da ekle
-    if (now.getDate() > 15) {
-        month++;
-        if (month > 11) {
-            month = 0;
-            year++;
-        }
-    }
-    
-    // 12 ay ekle (geçmiş ve gelecek aylar)
-    for (let i = 0; i < 12; i++) {
-        const date = new Date(year, month - 6 + i, 1);
-        const monthName = getMonthName(date);
-        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-        
-        const monthBtn = document.createElement('button');
-        monthBtn.textContent = monthName;
-        monthBtn.dataset.monthKey = monthKey;
-        
-        monthBtn.addEventListener('click', () => {
-            openMonthlyWorks(monthKey, monthName);
-        });
-        
-        monthlyWorksMenu.appendChild(monthBtn);
-        
-        // Eğer bu ay için dokümanlar yoksa, başlangıç dokümanlarını oluştur
-        if (!data.monthlyDocuments[monthKey]) {
-            data.monthlyDocuments[monthKey] = [
-                { name: "Çasmer Mutabakat.docx", data: "" },
-                { name: "Çasmer Puantaj.xlsx", data: "" },
-                { name: "Genel Hijyen ve Saha Denetim Formu.xlsx", data: "" },
-                { name: "Mutfak Hijyen Denetim Formu.xlsx", data: "" },
-                { name: "Tuvalet Hijyen Denetim Formu.xlsx", data: "" }
-            ];
-        }
-    }
-    
-    saveData();
-}
-
-// Aylık işleri aç
-function openMonthlyWorks(monthKey, monthName) {
-    currentMonth = monthKey;
-    monthlyTitle.textContent = monthName;
-    
-    welcomeScreen.classList.add('hidden');
-    monthlyWorksDetail.classList.remove('hidden');
-    
-    renderMonthlyDocuments();
-}
-
-// Aylık dokümanları render et
-function renderMonthlyDocuments() {
-    documentsList.innerHTML = "";
-    
-    const documents = data.monthlyDocuments[currentMonth] || [];
-    
-    documents.forEach(doc => {
-        const docItem = document.createElement('div');
-        docItem.className = 'document-item';
-        docItem.textContent = doc.name;
-        
-        docItem.addEventListener('click', () => {
-            // Burada dokümanı açma işlemi yapılabilir
-            alert(`"${doc.name}" dokümanı açılıyor (simüle edildi)`);
-        });
-        
-        documentsList.appendChild(docItem);
-    });
-}
-
-// Geri butonu (aylık işlerden ana sayfaya)
-backFromMonthlyBtn.addEventListener('click', () => {
-    monthlyWorksDetail.classList.add('hidden');
-    welcomeScreen.classList.remove('hidden');
-    currentMonth = null;
-});
-
-// Ayarlardan ana sayfaya dön
-backFromSettingsBtn.addEventListener('click', () => {
-    settingsPage.classList.add('hidden');
-    welcomeScreen.classList.remove('hidden');
-});
-
-// Yardımcı fonksiyonlar
-function isValidDate(dateString) {
-    const regex = /^\d{2}\.\d{2}\.\d{4}$/;
-    if (!regex.test(dateString)) return false;
-    
-    const parts = dateString.split('.');
-    const day = parseInt(parts[0], 10);
-    const month = parseInt(parts[1], 10);
-    const year = parseInt(parts[2], 10);
-    
-    if (day < 1 || day > 31) return false;
-    if (month < 1 || month > 12) return false;
-    
-    return true;
-}
-
-function formatDate(date, forFileName = false) {
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    
-    if (forFileName) {
-        return `${day}-${month}-${year}`;
-    }
-    
-    return `${day}.${month}.${year}`;
-}
-
-function getMonthName(date) {
-    const months = [
-        "OCAK", "ŞUBAT", "MART", "NİSAN", "MAYIS", "HAZİRAN",
-        "TEMMUZ", "AĞUSTOS", "EYLÜL", "EKİM", "KASIM", "ARALIK"
-    ];
-    return `${months[date.getMonth()]} ${date.getFullYear()}`;
-}
-
-function dataURLtoBlob(dataURL) {
-    const arr = dataURL.split(',');
-    const mime = arr[0].match(/:(.*?);/)[1];
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    
-    while (n--) {
-        u8arr[n] = bstr.charCodeAt(n);
-    }
-    
-    return new Blob([u8arr], { type: mime });
-}
-
-// Veriyi localStorage'a kaydet
-function saveData() {
-    localStorage.setItem('isyeriHekimligiData', JSON.stringify(data));
-}
-
-// Veriyi localStorage'dan yükle
-function loadData() {
-    const savedData = localStorage.getItem('isyeriHekimligiData');
-    if (savedData) {
-        data = JSON.parse(savedData);
-    }
-}
-
-// Sayfa yüklendiğinde çalışacak kod
-document.addEventListener('DOMContentLoaded', () => {
-    // Şifre ekranını göster
-    loginScreen.classList.remove('hidden');
-    mainPage.classList.add('hidden');
-    
-    // Tarih inputlarına otomatik nokta ekleme
-    const dateInputs = document.querySelectorAll('input[placeholder="gg.aa.yyyy"]');
-    dateInputs.forEach(input => {
-        input.addEventListener('input', function(e) {
-            let value = this.value.replace(/\D/g, '');
-            
-            if (value.length > 2 && value.length <= 4) {
-                value = value.substring(0, 2) + '.' + value.substring(2);
-            } else if (value.length > 4) {
-                value = value.substring(0, 2) + '.' + value.substring(2, 4) + '.' + value.substring(4, 8);
-            }
-            
-            this.value = value;
-        });
-    });
-});
