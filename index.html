@@ -7,230 +7,162 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Şifre Giriş Ekranı -->
-    <div id="loginScreen" class="modal">
+    <div id="passwordScreen" class="modal">
         <div class="modal-content">
-            <h2>Giriş Yap</h2>
-            <input type="password" id="passwordInput" placeholder="Şifre" value="1234">
-            <button id="loginButton">Giriş</button>
+            <h2>Giriş</h2>
+            <input type="password" id="passwordInput" placeholder="Şifre">
+            <button id="loginBtn">Giriş Yap</button>
             <p id="loginError" class="error-message"></p>
         </div>
     </div>
 
-    <!-- Ana Ekran -->
-    <div id="mainScreen" class="hidden">
-        <!-- Üst Menü -->
-        <div class="top-menu">
-            <button id="logoutButton">Çıkış</button>
-        </div>
+    <div id="mainApp" style="display: none;">
+        <header>
+            <h1>İşyeri Hekimliği Veri Kayıt Programı</h1>
+            <button id="logoutBtn" class="logout-btn">Çıkış</button>
+        </header>
 
-        <!-- Sol Menü -->
-        <div class="side-menu">
-            <div class="menu-section">
-                <button id="monthlyWorksButton">Aylık İşlerim ▼</button>
-                <div id="monthlyWorksMenu" class="submenu hidden">
-                    <!-- Aylar buraya dinamik olarak eklenecek -->
+        <div class="container">
+            <aside class="sidebar">
+                <div class="menu-section">
+                    <button id="monthlyWorksBtn" class="menu-btn">Aylık İşlerim ▼</button>
+                    <div id="monthlyWorksMenu" class="submenu">
+                        <!-- Aylar buraya dinamik olarak eklenecek -->
+                    </div>
                 </div>
-            </div>
-            
-            <div class="menu-section">
-                <div id="workplacesList">
+
+                <div class="menu-section">
                     <h3>İş Yerlerim</h3>
-                    <button id="addWorkplaceButton">İşyeri Ekle</button>
-                    <!-- İşyerleri listesi buraya dinamik olarak eklenecek -->
+                    <div id="workplacesList">
+                        <!-- İşyerleri buraya eklenecek -->
+                    </div>
+                    <button id="addWorkplaceBtn" class="add-btn">İşyeri Ekle</button>
                 </div>
-            </div>
-            
-            <button id="settingsButton" class="settings-button">Ayarla</button>
-        </div>
 
-        <!-- Ana İçerik -->
-        <div class="main-content">
-            <div id="welcomeScreen">
-                <h1>İşyeri Hekimliği Veri Kayıt Programı</h1>
-                <p>Soldaki menüden işyerlerinizi seçebilir veya aylık işlerinizi görüntüleyebilirsiniz.</p>
-            </div>
+                <button id="settingsBtn" class="settings-btn">Ayarla</button>
+            </aside>
 
-            <!-- İşyeri Detay Ekranı -->
-            <div id="workplaceDetail" class="hidden">
-                <div class="workplace-header">
-                    <button id="backButton">← Geri</button>
-                    <h2 id="workplaceTitle"></h2>
-                    <div class="workplace-actions">
-                        <button id="importExcelButton">Excel'den Al</button>
-                        <button id="exportExcelButton">Excel'e Ver</button>
-                        <button id="backupButton">Yedek Al</button>
-                        <button id="restoreButton">Yedekten Dön</button>
-                        <button id="addPersonButton">Kişi Ekle</button>
+            <main class="content">
+                <div id="welcomeScreen">
+                    <h2>Hoş Geldiniz</h2>
+                    <p>Soldaki menüden işyerlerinizi seçebilir veya aylık işlerinizi görüntüleyebilirsiniz.</p>
+                </div>
+
+                <div id="workplaceContent" style="display: none;">
+                    <div class="workplace-header">
+                        <button id="backToMainBtn" class="back-btn">← Geri</button>
+                        <h2 id="workplaceTitle"></h2>
+                        <div class="workplace-actions">
+                            <button id="importExcelBtn">Excel'den Al</button>
+                            <button id="exportExcelBtn">Excel'e Ver</button>
+                            <button id="backupBtn">Yedek Al</button>
+                            <button id="restoreBtn">Yedekten Dön</button>
+                        </div>
+                    </div>
+
+                    <button id="addPersonBtn" class="add-btn">Kişi Ekle</button>
+
+                    <table id="peopleTable">
+                        <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>TC Kimlik No</th>
+                                <th>Ad Soyad</th>
+                                <th>Mevcut Muayene Tarihi</th>
+                                <th>Sonraki Muayene Tarihi</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Kişi listesi buraya eklenecek -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="monthlyDocumentsContent" style="display: none;">
+                    <div class="monthly-header">
+                        <button id="backFromMonthlyBtn" class="back-btn">← Geri</button>
+                        <h2 id="monthlyTitle"></h2>
+                    </div>
+
+                    <div id="monthlyDocumentsList">
+                        <!-- Aylık belgeler buraya eklenecek -->
                     </div>
                 </div>
-                
-                <table id="personsTable">
-                    <thead>
-                        <tr>
-                            <th>S.No</th>
-                            <th>TC Kimlik No</th>
-                            <th>İsim Soyisim</th>
-                            <th>Mevcut Muayene Tarihi</th>
-                            <th>Sonraki Muayene Tarihi</th>
-                            <th>EK-2</th>
-                            <th>EK-2 Yükle</th>
-                            <th>EK-2 Göster</th>
-                            <th>Düzenle</th>
-                            <th>Sil</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Kişi listesi buraya dinamik olarak eklenecek -->
-                    </tbody>
-                </table>
-            </div>
 
-            <!-- Aylık İşler Ekranı -->
-            <div id="monthlyFiles" class="hidden">
-                <div class="monthly-header">
-                    <button id="backFromMonthlyButton">← Geri</button>
-                    <h2 id="monthTitle"></h2>
-                </div>
-                
-                <div class="file-list">
-                    <!-- Dosya listesi buraya dinamik olarak eklenecek -->
-                </div>
-            </div>
-
-            <!-- EK-2 Listesi Ekranı -->
-            <div id="ek2ListScreen" class="modal hidden">
-                <div class="modal-content">
-                    <h2>EK-2 Belgeleri</h2>
-                    <div id="ek2List">
-                        <!-- EK-2 listesi buraya dinamik olarak eklenecek -->
+                <div id="settingsContent" style="display: none;">
+                    <div class="settings-header">
+                        <button id="backFromSettingsBtn" class="back-btn">← Geri</button>
+                        <h2>Doktor Bilgileri</h2>
                     </div>
-                    <button id="closeEk2ListButton">Kapat</button>
+
+                    <form id="doctorInfoForm">
+                        <div class="form-group">
+                            <label for="doctorName">Ad Soyad:</label>
+                            <input type="text" id="doctorName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="diplomaNo">Diploma No:</label>
+                            <input type="text" id="diplomaNo" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="diplomaDate">Diploma Tarihi:</label>
+                            <input type="text" id="diplomaDate" placeholder="gg.aa.yyyy" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="certificateNo">İşyeri Hekimliği Belge No:</label>
+                            <input type="text" id="certificateNo" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="certificateDate">Belge Tarihi:</label>
+                            <input type="text" id="certificateDate" placeholder="gg.aa.yyyy" required>
+                        </div>
+                        <button type="submit" class="save-btn">Kaydet</button>
+                    </form>
                 </div>
-            </div>
+            </main>
         </div>
     </div>
 
-    <!-- Ayarlar Modal -->
-    <div id="settingsModal" class="modal hidden">
+    <!-- Kişi Ekle/Düzenle Modalı -->
+    <div id="personModal" class="modal">
         <div class="modal-content">
-            <h2>Doktor Bilgileri</h2>
-            <form id="doctorInfoForm">
-                <label for="doctorName">Adı Soyadı:</label>
-                <input type="text" id="doctorName" required>
-                
-                <label for="diplomaDate">Diploma Tarihi:</label>
-                <input type="text" id="diplomaDate" placeholder="gg.aa.yyyy" required>
-                
-                <label for="diplomaNo">Diploma No:</label>
-                <input type="text" id="diplomaNo" required>
-                
-                <label for="diplomaRegDate">Diploma Tescil Tarihi:</label>
-                <input type="text" id="diplomaRegDate" placeholder="gg.aa.yyyy" required>
-                
-                <label for="diplomaRegNo">Diploma Tescil No:</label>
-                <input type="text" id="diplomaRegNo" required>
-                
-                <label for="doctorCertDate">İşyeri Hekimliği Belgesi Tarihi:</label>
-                <input type="text" id="doctorCertDate" placeholder="gg.aa.yyyy" required>
-                
-                <label for="doctorCertNo">İşyeri Hekimliği Belgesi No:</label>
-                <input type="text" id="doctorCertNo" required>
-                
-                <button type="submit">Kaydet</button>
-                <button type="button" id="closeSettingsButton">Kapat</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- İşyeri Ekle/Düzenle Modal -->
-    <div id="workplaceModal" class="modal hidden">
-        <div class="modal-content">
-            <h2 id="workplaceModalTitle">İşyeri Ekle</h2>
-            <form id="workplaceForm">
-                <input type="hidden" id="workplaceId">
-                <label for="workplaceName">İşyeri Adı:</label>
-                <input type="text" id="workplaceName" required>
-                
-                <button type="submit">Kaydet</button>
-                <button type="button" id="closeWorkplaceButton">Kapat</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Kişi Ekle/Düzenle Modal -->
-    <div id="personModal" class="modal hidden">
-        <div class="modal-content">
+            <span class="close-btn">&times;</span>
             <h2 id="personModalTitle">Kişi Ekle</h2>
             <form id="personForm">
                 <input type="hidden" id="personId">
-                <input type="hidden" id="personWorkplaceId">
-                
-                <label for="personTC">TC Kimlik No:</label>
-                <input type="text" id="personTC" required>
-                
-                <label for="personName">İsim Soyisim:</label>
-                <input type="text" id="personName" required>
-                
-                <label for="currentExamDate">Mevcut Muayene Tarihi:</label>
-                <input type="text" id="currentExamDate" placeholder="gg.aa.yyyy" required>
-                
-                <label for="nextExamDate">Sonraki Muayene Tarihi:</label>
-                <input type="text" id="nextExamDate" placeholder="gg.aa.yyyy" required>
-                
-                <button type="submit">Kaydet</button>
-                <button type="button" id="closePersonButton">Kapat</button>
+                <div class="form-group">
+                    <label for="personTC">TC Kimlik No:</label>
+                    <input type="text" id="personTC" required>
+                </div>
+                <div class="form-group">
+                    <label for="personName">Ad Soyad:</label>
+                    <input type="text" id="personName" required>
+                </div>
+                <div class="form-group">
+                    <label for="currentExamDate">Mevcut Muayene Tarihi:</label>
+                    <input type="text" id="currentExamDate" placeholder="gg.aa.yyyy" required>
+                </div>
+                <div class="form-group">
+                    <label for="nextExamDate">Sonraki Muayene Tarihi:</label>
+                    <input type="text" id="nextExamDate" placeholder="gg.aa.yyyy" required>
+                </div>
+                <button type="submit" class="save-btn">Kaydet</button>
             </form>
         </div>
     </div>
 
-    <!-- Dosya Yükle Modal -->
-    <div id="fileUploadModal" class="modal hidden">
+    <!-- Ek-2 Listesi Modalı -->
+    <div id="ek2ListModal" class="modal">
         <div class="modal-content">
-            <h2>EK-2 Yükle</h2>
-            <input type="file" id="ek2FileInput" accept=".docx">
-            <button id="uploadEk2Button">Yükle</button>
-            <button id="closeFileUploadButton">Kapat</button>
-            <p id="fileUploadError" class="error-message"></p>
+            <span class="close-btn">&times;</span>
+            <h2>Ek-2 Belgeleri</h2>
+            <div id="ek2DocumentsList">
+                <!-- Ek-2 belgeleri buraya eklenecek -->
+            </div>
         </div>
     </div>
 
-    <!-- Excel İşlemleri Modal -->
-    <div id="excelModal" class="modal hidden">
-        <div class="modal-content">
-            <h2 id="excelModalTitle">Excel İşlemleri</h2>
-            <div id="excelImportSection" class="hidden">
-                <input type="file" id="excelFileInput" accept=".xlsx,.xls">
-                <button id="importExcelConfirmButton">İçe Aktar</button>
-            </div>
-            <div id="excelExportSection" class="hidden">
-                <button id="exportExcelConfirmButton">Dışa Aktar</button>
-                <a id="downloadExcelLink" class="hidden"></a>
-            </div>
-            <button id="closeExcelButton">Kapat</button>
-            <p id="excelError" class="error-message"></p>
-        </div>
-    </div>
-
-    <!-- Yedek İşlemleri Modal -->
-    <div id="backupModal" class="modal hidden">
-        <div class="modal-content">
-            <h2 id="backupModalTitle">Yedek İşlemleri</h2>
-            <div id="backupSection" class="hidden">
-                <button id="backupConfirmButton">Yedek Oluştur</button>
-                <a id="downloadBackupLink" class="hidden"></a>
-            </div>
-            <div id="restoreSection" class="hidden">
-                <input type="file" id="backupFileInput" accept=".json">
-                <button id="restoreConfirmButton">Yedekten Geri Yükle</button>
-            </div>
-            <button id="closeBackupButton">Kapat</button>
-            <p id="backupError" class="error-message"></p>
-        </div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
