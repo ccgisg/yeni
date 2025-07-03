@@ -1,555 +1,214 @@
-// Veri Yapıları
-let data = {
-    password: "1234", // Varsayılan şifre
-    doctorInfo: {
-        name: "",
-        title: "",
-        phone: "",
-        email: ""
-    },
-    workplaces: [],
-    currentWorkplace: null,
-    currentPerson: null
-};
-
-// DOM Elementleri
-const loginScreen = document.getElementById('loginScreen');
-const mainScreen = document.getElementById('mainScreen');
-const passwordInput = document.getElementById('passwordInput');
-const loginButton = document.getElementById('loginButton');
-const loginError = document.getElementById('loginError');
-const logoutButton = document.getElementById('logoutButton');
-const monthlyWorksBtn = document.getElementById('monthlyWorksBtn');
-const monthlyWorksContent = document.getElementById('monthlyWorksContent');
-const workplacesList = document.getElementById('workplacesList');
-const addWorkplaceBtn = document.getElementById('addWorkplaceBtn');
-const settingsBtn = document.getElementById('settingsBtn');
-const mainContent = document.getElementById('mainContent');
-const workplaceModal = document.getElementById('workplaceModal');
-const modalTitle = document.getElementById('modalTitle');
-const workplaceName = document.getElementById('workplaceName');
-const saveWorkplaceBtn = document.getElementById('saveWorkplaceBtn');
-const closeModalBtns = document.querySelectorAll('.close-btn');
-const settingsModal = document.getElementById('settingsModal');
-const doctorName = document.getElementById('doctorName');
-const doctorTitle = document.getElementById('doctorTitle');
-const doctorPhone = document.getElementById('doctorPhone');
-const doctorEmail = document.getElementById('doctorEmail');
-const saveDoctorInfoBtn = document.getElementById('saveDoctorInfoBtn');
-const personModal = document.getElementById('personModal');
-const personModalTitle = document.getElementById('personModalTitle');
-const personTc = document.getElementById('personTc');
-const personName = document.getElementById('personName');
-const currentExamDate = document.getElementById('currentExamDate');
-const nextExamDate = document.getElementById('nextExamDate');
-const ek2File = document.getElementById('ek2File');
-const savePersonBtn = document.getElementById('savePersonBtn');
-
-// Sayfa Yüklendiğinde
-document.addEventListener('DOMContentLoaded', () => {
-    // Yerel depolamadan verileri yükle
-    loadData();
-    
-    // Aylık işler menüsünü oluştur
-    createMonthlyWorksMenu();
-    
-    // İşyerleri listesini güncelle
-    updateWorkplacesList();
-    
-    // Doktor bilgilerini yükle
-    loadDoctorInfo();
-});
-
-// Giriş İşlemi
-loginButton.addEventListener('click', () => {
-    const password = passwordInput.value.trim();
-    
-    if (password === data.password) {
-        loginScreen.classList.add('hidden');
-        mainScreen.classList.remove('hidden');
-        loginError.textContent = "";
-    } else {
-        loginError.textContent = "Hatalı şifre! Lütfen tekrar deneyin.";
-    }
-});
-
-// Şifre alanında Enter tuşuna basıldığında
-passwordInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        loginButton.click();
-    }
-});
-
-// Çıkış İşlemi
-logoutButton.addEventListener('click', () => {
-    mainScreen.classList.add('hidden');
-    loginScreen.classList.remove('hidden');
-    passwordInput.value = "";
-    passwordInput.focus();
-});
-
-// Aylık İşler Menüsü Toggle
-monthlyWorksBtn.addEventListener('click', () => {
-    monthlyWorksBtn.classList.toggle('active');
-    const content = monthlyWorksContent;
-    if (content.style.display === 'block') {
-        content.style.display = 'none';
-    } else {
-        content.style.display = 'block';
-    }
-});
-
-// İşyeri Ekle Butonu
-addWorkplaceBtn.addEventListener('click', () => {
-    modalTitle.textContent = "İşyeri Ekle";
-    workplaceName.value = "";
-    workplaceModal.classList.remove('hidden');
-    data.currentWorkplace = null;
-});
-
-// İşyeri Kaydet Butonu
-saveWorkplaceBtn.addEventListener('click', () => {
-    const name = workplaceName.value.trim();
-    
-    if (!name) {
-        alert("İşyeri adı boş olamaz!");
-        return;
-    }
-    
-    if (data.currentWorkplace === null) {
-        // Yeni işyeri ekle
-        const newWorkplace = {
-            id: Date.now().toString(),
-            name: name,
-            persons: []
-        };
-        data.workplaces.push(newWorkplace);
-    } else {
-        // Mevcut işyerini güncelle
-        const workplace = data.workplaces.find(w => w.id === data.currentWorkplace);
-        if (workplace) {
-            workplace.name = name;
-        }
-    }
-    
-    saveData();
-    updateWorkplacesList();
-    workplaceModal.classList.add('hidden');
-});
-
-// İşyeri Düzenle
-function editWorkplace(id) {
-    const workplace = data.workplaces.find(w => w.id === id);
-    if (workplace) {
-        modalTitle.textContent = "İşyeri Düzenle";
-        workplaceName.value = workplace.name;
-        workplaceModal.classList.remove('hidden');
-        data.currentWorkplace = id;
-    }
+/* Genel Stiller */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-// İşyeri Sil
-function deleteWorkplace(id) {
-    if (confirm("Bu işyerini silmek istediğinize emin misiniz?")) {
-        data.workplaces = data.workplaces.filter(w => w.id !== id);
-        saveData();
-        updateWorkplacesList();
-        
-        // Eğer silinen işyeri şu an görüntüleniyorsa, ana sayfaya dön
-        if (data.currentWorkplace === id) {
-            showMainContent();
-            data.currentWorkplace = null;
-        }
-    }
+body {
+    background-color: #f5f5f5;
+    color: #333;
 }
 
-// İşyeri Aç
-function openWorkplace(id) {
-    const workplace = data.workplaces.find(w => w.id === id);
-    if (workplace) {
-        data.currentWorkplace = id;
-        showWorkplaceContent(workplace);
-    }
+.hidden {
+    display: none !important;
 }
 
-// İşyeri Listesini Güncelle
-function updateWorkplacesList() {
-    workplacesList.innerHTML = "";
-    
-    data.workplaces.forEach(workplace => {
-        const workplaceItem = document.createElement('div');
-        workplaceItem.className = 'workplace-item';
-        workplaceItem.innerHTML = `
-            <span onclick="openWorkplace('${workplace.id}')">${workplace.name}</span>
-            <div class="workplace-actions">
-                <button onclick="editWorkplace('${workplace.id}')"><i class="fas fa-edit"></i></button>
-                <button onclick="deleteWorkplace('${workplace.id}')"><i class="fas fa-trash"></i></button>
-            </div>
-        `;
-        workplacesList.appendChild(workplaceItem);
-    });
+/* Giriş Ekranı */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #e9f5ff;
 }
 
-// İşyeri İçeriğini Göster
-function showWorkplaceContent(workplace) {
-    mainContent.innerHTML = `
-        <div class="workplace-header">
-            <h2 class="workplace-title">${workplace.name}</h2>
-            <div class="workplace-actions-top">
-                <button class="back-btn" onclick="showMainContent()"><i class="fas fa-arrow-left"></i> Geri</button>
-                <button class="excel-btn" onclick="exportToExcel('${workplace.id}')"><i class="fas fa-file-excel"></i> Excel'e Aktar</button>
-                <button class="excel-btn" onclick="importFromExcel('${workplace.id}')"><i class="fas fa-file-import"></i> Excel'den Al</button>
-                <button class="backup-btn" onclick="backupWorkplace('${workplace.id}')"><i class="fas fa-save"></i> Yedek Al</button>
-                <button class="restore-btn" onclick="restoreWorkplace('${workplace.id}')"><i class="fas fa-undo"></i> Yedekten Dön</button>
-                <button class="add-btn" onclick="addPerson()"><i class="fas fa-user-plus"></i> Kişi Ekle</button>
-            </div>
-        </div>
-        <table class="persons-table">
-            <thead>
-                <tr>
-                    <th>S.No</th>
-                    <th>TC Kimlik No</th>
-                    <th>Ad Soyad</th>
-                    <th>Mevcut Muayene Tarihi</th>
-                    <th>Sonraki Muayene Tarihi</th>
-                    <th>EK-2</th>
-                    <th>İşlemler</th>
-                </tr>
-            </thead>
-            <tbody id="personsTableBody">
-                ${workplace.persons.map((person, index) => `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${person.tc}</td>
-                        <td>${person.name}</td>
-                        <td>${formatDate(person.currentExamDate)}</td>
-                        <td>${formatDate(person.nextExamDate)}</td>
-                        <td>
-                            ${person.ek2File ? `
-                                <button class="ek2-btn" onclick="showEk2('${workplace.id}', '${person.id}')"><i class="fas fa-eye"></i> Göster</button>
-                            ` : `
-                                <button class="ek2-btn" onclick="uploadEk2('${workplace.id}', '${person.id}')"><i class="fas fa-upload"></i> Yükle</button>
-                            `}
-                        </td>
-                        <td>
-                            <button class="edit-btn" onclick="editPerson('${workplace.id}', '${person.id}')"><i class="fas fa-edit"></i></button>
-                            <button class="delete-btn" onclick="deletePerson('${workplace.id}', '${person.id}')"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `).join('')}
-            </tbody>
-        </table>
-    `;
+.login-box {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 350px;
+    text-align: center;
 }
 
-// Ana İçeriği Göster
-function showMainContent() {
-    mainContent.innerHTML = `
-        <div class="welcome-message">
-            <h2>Hoş Geldiniz</h2>
-            <p>Soldaki menüden işyerlerinizi veya aylık işlerinizi seçebilirsiniz.</p>
-        </div>
-    `;
-    data.currentWorkplace = null;
+.login-box h2 {
+    margin-bottom: 1.5rem;
+    color: #2c3e50;
 }
 
-// Kişi Ekle
-function addPerson() {
-    if (!data.currentWorkplace) return;
-    
-    personModalTitle.textContent = "Kişi Ekle";
-    personTc.value = "";
-    personName.value = "";
-    currentExamDate.value = "";
-    nextExamDate.value = "";
-    ek2File.value = "";
-    data.currentPerson = null;
-    personModal.classList.remove('hidden');
+.login-box input {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
 }
 
-// Kişi Düzenle
-function editPerson(workplaceId, personId) {
-    const workplace = data.workplaces.find(w => w.id === workplaceId);
-    if (!workplace) return;
-    
-    const person = workplace.persons.find(p => p.id === personId);
-    if (!person) return;
-    
-    personModalTitle.textContent = "Kişi Düzenle";
-    personTc.value = person.tc;
-    personName.value = person.name;
-    currentExamDate.value = person.currentExamDate;
-    nextExamDate.value = person.nextExamDate;
-    ek2File.value = "";
-    data.currentPerson = personId;
-    personModal.classList.remove('hidden');
+.login-box button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-// Kişi Kaydet
-savePersonBtn.addEventListener('click', () => {
-    if (!data.currentWorkplace) return;
-    
-    const workplace = data.workplaces.find(w => w.id === data.currentWorkplace);
-    if (!workplace) return;
-    
-    const tc = personTc.value.trim();
-    const name = personName.value.trim();
-    const currentDate = currentExamDate.value;
-    const nextDate = nextExamDate.value;
-    
-    if (!tc || !name) {
-        alert("TC Kimlik No ve Ad Soyad boş olamaz!");
-        return;
-    }
-    
-    // EK-2 dosyasını işle
-    const file = ek2File.files[0];
-    let ek2FileName = null;
-    
-    if (file) {
-        ek2FileName = `ek2_${Date.now()}_${file.name}`;
-        // Gerçek bir uygulamada burada dosyayı sunucuya yüklemeniz gerekir
-        // Bu örnekte sadece dosya adını kaydediyoruz
-    }
-    
-    if (data.currentPerson === null) {
-        // Yeni kişi ekle
-        const newPerson = {
-            id: Date.now().toString(),
-            tc: tc,
-            name: name,
-            currentExamDate: currentDate,
-            nextExamDate: nextDate,
-            ek2File: ek2FileName
-        };
-        workplace.persons.push(newPerson);
-    } else {
-        // Mevcut kişiyi güncelle
-        const person = workplace.persons.find(p => p.id === data.currentPerson);
-        if (person) {
-            person.tc = tc;
-            person.name = name;
-            person.currentExamDate = currentDate;
-            person.nextExamDate = nextDate;
-            if (ek2FileName) {
-                person.ek2File = ek2FileName;
-            }
-        }
-    }
-    
-    saveData();
-    showWorkplaceContent(workplace);
-    personModal.classList.add('hidden');
-});
-
-// Kişi Sil
-function deletePerson(workplaceId, personId) {
-    if (confirm("Bu kişiyi silmek istediğinize emin misiniz?")) {
-        const workplace = data.workplaces.find(w => w.id === workplaceId);
-        if (workplace) {
-            workplace.persons = workplace.persons.filter(p => p.id !== personId);
-            saveData();
-            showWorkplaceContent(workplace);
-        }
-    }
+.login-box button:hover {
+    background-color: #2980b9;
 }
 
-// EK-2 Yükle
-function uploadEk2(workplaceId, personId) {
-    const workplace = data.workplaces.find(w => w.id === workplaceId);
-    if (!workplace) return;
-    
-    const person = workplace.persons.find(p => p.id === personId);
-    if (!person) return;
-    
-    // Dosya seçim dialogunu tetikle
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = '.pdf,.doc,.docx';
-    fileInput.onchange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const fileName = `ek2_${Date.now()}_${file.name}`;
-            // Gerçek bir uygulamada burada dosyayı sunucuya yüklemeniz gerekir
-            // Bu örnekte sadece dosya adını kaydediyoruz
-            person.ek2File = fileName;
-            saveData();
-            showWorkplaceContent(workplace);
-        }
-    };
-    fileInput.click();
+.error-message {
+    color: #e74c3c;
+    margin-top: 1rem;
+    font-size: 0.9rem;
 }
 
-// EK-2 Göster
-function showEk2(workplaceId, personId) {
-    const workplace = data.workplaces.find(w => w.id === workplaceId);
-    if (!workplace) return;
-    
-    const person = workplace.persons.find(p => p.id === personId);
-    if (!person || !person.ek2File) return;
-    
-    alert(`EK-2 dosyası gösteriliyor: ${person.ek2File}\n\nGerçek bir uygulamada burada dosya görüntüleme işlemi yapılacaktır.`);
+/* Ana Uygulama Konteyneri */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
 }
 
-// Ayarlar Butonu
-settingsBtn.addEventListener('click', () => {
-    settingsModal.classList.remove('hidden');
-});
-
-// Doktor Bilgilerini Kaydet
-saveDoctorInfoBtn.addEventListener('click', () => {
-    data.doctorInfo = {
-        name: doctorName.value.trim(),
-        title: doctorTitle.value.trim(),
-        phone: doctorPhone.value.trim(),
-        email: doctorEmail.value.trim()
-    };
-    
-    saveData();
-    settingsModal.classList.add('hidden');
-    alert("Doktor bilgileri kaydedildi!");
-});
-
-// Modal Kapatma
-closeModalBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        workplaceModal.classList.add('hidden');
-        settingsModal.classList.add('hidden');
-        personModal.classList.add('hidden');
-    });
-});
-
-// Aylık İşler Menüsü Oluştur
-function createMonthlyWorksMenu() {
-    monthlyWorksContent.innerHTML = "";
-    
-    // Şu anki tarih
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth();
-    
-    // Ayın 15'inden sonra bir sonraki ayın klasörünü oluştur
-    let startMonth = currentMonth;
-    if (now.getDate() > 15) {
-        startMonth = currentMonth + 1;
-    }
-    
-    // 12 ay için menü oluştur
-    for (let i = 0; i < 12; i++) {
-        const monthIndex = (startMonth - i + 12) % 12;
-        const year = currentYear + Math.floor((startMonth - i) / 12);
-        
-        const monthName = getMonthName(monthIndex);
-        const monthItem = document.createElement('a');
-        monthItem.href = "#";
-        monthItem.textContent = `${year} ${monthName}`;
-        monthItem.addEventListener('click', () => {
-            alert(`${year} ${monthName} ayı seçildi. Gerçek bir uygulamada burada ilgili işlemler yapılacaktır.`);
-        });
-        
-        monthlyWorksContent.appendChild(monthItem);
-    }
+/* Üst Menü */
+.header {
+    background-color: #2c3e50;
+    color: white;
+    padding: 1rem;
+    display: flex;
+    justify-content: flex-end;
 }
 
-// Ay Adını Getir
-function getMonthName(monthIndex) {
-    const months = [
-        "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran",
-        "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"
-    ];
-    return months[monthIndex];
+.logout-btn {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-// Tarih Formatı
-function formatDate(dateString) {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleDateString('tr-TR');
+.logout-btn:hover {
+    background-color: #c0392b;
 }
 
-// Excel'e Aktar
-function exportToExcel(workplaceId) {
-    const workplace = data.workplaces.find(w => w.id === workplaceId);
-    if (!workplace) return;
-    
-    // Bu örnekte sadece alert gösteriyoruz
-    // Gerçek bir uygulamada bir Excel kütüphanesi (örneğin SheetJS) kullanılabilir
-    alert(`${workplace.name} işyerindeki kişi listesi Excel'e aktarılacak.\n\nGerçek bir uygulamada burada Excel dosyası oluşturulacaktır.`);
+/* Ana İçerik Düzeni */
+.main-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
 }
 
-// Excel'den Al
-function importFromExcel(workplaceId) {
-    const workplace = data.workplaces.find(w => w.id === workplaceId);
-    if (!workplace) return;
-    
-    // Bu örnekte sadece alert gösteriyoruz
-    // Gerçek bir uygulamada bir Excel kütüphanesi (örneğin SheetJS) kullanılabilir
-    alert(`${workplace.name} işyerine Excel'den veri aktarılacak.\n\nGerçek bir uygulamada burada Excel dosyası okunacak ve veriler işlenecektir.`);
+/* Sol Menü */
+.sidebar {
+    width: 250px;
+    background-color: #34495e;
+    color: white;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
 }
 
-// Yedek Al
-function backupWorkplace(workplaceId) {
-    const workplace = data.workplaces.find(w => w.id === workplaceId);
-    if (!workplace) return;
-    
-    // Gerçek bir uygulamada burada sunucuya yedekleme yapılır
-    // Bu örnekte sadece localStorage'a kaydediyoruz
-    localStorage.setItem(`backup_${workplaceId}`, JSON.stringify(workplace));
-    alert(`${workplace.name} işyeri yedeklendi!`);
+.menu-section {
+    margin-bottom: 1.5rem;
 }
 
-// Yedekten Dön
-function restoreWorkplace(workplaceId) {
-    if (!confirm("Bu işyerini yedekten geri yüklemek istediğinize emin misiniz? Mevcut veriler kaybolabilir!")) {
-        return;
-    }
-    
-    const backup = localStorage.getItem(`backup_${workplaceId}`);
-    if (!backup) {
-        alert("Bu işyeri için yedek bulunamadı!");
-        return;
-    }
-    
-    try {
-        const workplaceIndex = data.workplaces.findIndex(w => w.id === workplaceId);
-        if (workplaceIndex !== -1) {
-            data.workplaces[workplaceIndex] = JSON.parse(backup);
-            saveData();
-            showWorkplaceContent(data.workplaces[workplaceIndex]);
-            alert("Yedekten geri yükleme başarılı!");
-        }
-    } catch (e) {
-        alert("Yedekten geri yükleme sırasında bir hata oluştu!");
-        console.error(e);
-    }
+.menu-section h3 {
+    margin-bottom: 0.5rem;
+    color: #ecf0f1;
 }
 
-// Doktor Bilgilerini Yükle
-function loadDoctorInfo() {
-    doctorName.value = data.doctorInfo.name;
-    doctorTitle.value = data.doctorInfo.title;
-    doctorPhone.value = data.doctorInfo.phone;
-    doctorEmail.value = data.doctorInfo.email;
+.dropdown-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    text-align: left;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-// Verileri Kaydet
-function saveData() {
-    localStorage.setItem('isyeriHekimligiData', JSON.stringify(data));
+.dropdown-btn:hover {
+    background-color: #1a252f;
 }
 
-// Verileri Yükle
-function loadData() {
-    const savedData = localStorage.getItem('isyeriHekimligiData');
-    if (savedData) {
-        try {
-            data = JSON.parse(savedData);
-        } catch (e) {
-            console.error("Veri yükleme hatası:", e);
-        }
-    }
+.dropdown-container {
+    display: none;
+    padding-left: 1rem;
+    background-color: #2c3e50;
+    border-radius: 4px;
+    margin-bottom: 1rem;
 }
 
-// Pencere kapatılmadan önce verileri kaydet
-window.addEventListener('beforeunload', () => {
-    saveData();
-});
+.dropdown-container a {
+    display: block;
+    padding: 0.5rem;
+    color: #ecf0f1;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.dropdown-container a:hover {
+    background-color: #1a252f;
+}
+
+.workplaces-list {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+    background-color: #2c3e50;
+    border-radius: 4px;
+    padding: 0.5rem;
+}
+
+.workplace-item {
+    padding: 0.75rem;
+    margin-bottom: 0.25rem;
+    background-color: #3d566e;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.workplace-item:hover {
+    background-color: #4b6584;
+}
+
+.workplace-item.selected {
+    background-color: #3498db;
+}
+
+.workplace-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.workplace-actions button {
+    flex: 1;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.workplace-actions button:nth-child(1) {
+    background-color: #27ae60;
+    color: white;
+}
+
+.workplace-actions but
