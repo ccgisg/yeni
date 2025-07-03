@@ -7,235 +7,169 @@ body {
     color: #333;
 }
 
+.hidden {
+    display: none !important;
+}
+
 /* Modal Stilleri */
 .modal {
-    display: flex;
     position: fixed;
-    z-index: 1000;
-    left: 0;
     top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1000;
 }
 
 .modal-content {
-    background-color: #fff;
+    background-color: white;
     padding: 20px;
     border-radius: 5px;
     width: 400px;
     max-width: 90%;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.modal-content h2 {
-    margin-top: 0;
-    color: #2c3e50;
-}
-
-.close-btn {
+.close-modal {
     position: absolute;
     top: 10px;
-    right: 15px;
-    font-size: 24px;
-    font-weight: bold;
-    color: #aaa;
+    right: 10px;
+    font-size: 20px;
     cursor: pointer;
-}
-
-.close-btn:hover {
-    color: #333;
-}
-
-/* Şifre Ekranı */
-#passwordInput {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-#loginButton {
-    width: 100%;
-    padding: 10px;
-    background-color: #3498db;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-#loginButton:hover {
-    background-color: #2980b9;
 }
 
 .error-message {
-    color: #e74c3c;
+    color: red;
     margin-top: 10px;
 }
 
-/* Ana Uygulama Düzeni */
-#mainApp {
+/* Ana Sayfa Stilleri */
+#mainPage {
     display: flex;
     min-height: 100vh;
 }
 
-.top-bar {
+.top-menu {
     position: fixed;
     top: 0;
     right: 0;
-    width: calc(100% - 250px);
-    background-color: #2c3e50;
-    padding: 10px 20px;
+    padding: 10px;
+    background-color: #fff;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     z-index: 100;
-    display: flex;
-    justify-content: flex-end;
 }
 
 .logout-btn {
-    background-color: #e74c3c;
+    background-color: #f44336;
     color: white;
     border: none;
-    padding: 8px 15px;
+    padding: 8px 16px;
     border-radius: 4px;
     cursor: pointer;
 }
 
 .logout-btn:hover {
-    background-color: #c0392b;
+    background-color: #d32f2f;
 }
 
 .sidebar {
     width: 250px;
-    background-color: #34495e;
+    background-color: #2c3e50;
     color: white;
     padding: 20px 0;
+    height: 100vh;
     position: fixed;
-    height: 100%;
     overflow-y: auto;
 }
 
-.main-content {
-    margin-left: 250px;
-    padding: 70px 20px 20px;
-    width: calc(100% - 250px);
-    background-color: #fff;
-    min-height: 100vh;
-}
-
-/* Menü Stilleri */
 .menu-section {
     margin-bottom: 20px;
     padding: 0 15px;
 }
 
-.menu-section h3 {
-    color: #ecf0f1;
-    border-bottom: 1px solid #4a6278;
-    padding-bottom: 10px;
-}
-
 .menu-btn {
+    display: block;
     width: 100%;
     padding: 10px;
-    background-color: #2c3e50;
+    margin-bottom: 5px;
+    background-color: #34495e;
     color: white;
     border: none;
     text-align: left;
     cursor: pointer;
-    margin-bottom: 5px;
     border-radius: 4px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
 }
 
 .menu-btn:hover {
-    background-color: #1a252f;
+    background-color: #3d566e;
 }
 
 .submenu {
-    display: none;
-    padding-left: 15px;
+    margin-left: 15px;
     margin-top: 5px;
+    border-left: 2px solid #34495e;
+    padding-left: 10px;
 }
 
-.submenu a {
+.submenu button {
     display: block;
-    color: #ecf0f1;
-    padding: 5px 0;
-    text-decoration: none;
-}
-
-.submenu a:hover {
-    color: #3498db;
-}
-
-/* İşyeri Listesi */
-.workplace-item {
-    padding: 8px 10px;
-    background-color: #4a6278;
-    margin-bottom: 5px;
-    border-radius: 4px;
+    width: 100%;
+    padding: 8px;
+    background-color: transparent;
+    color: white;
+    border: none;
+    text-align: left;
     cursor: pointer;
+}
+
+.submenu button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.workplaces-header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.small-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.small-btn:hover {
+    background-color: #2980b9;
+}
+
+.workplaces-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.workplace-item {
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .workplace-item:hover {
-    background-color: #3a5268;
-}
-
-.workplace-actions {
-    display: flex;
-    gap: 5px;
-}
-
-.workplace-edit, .workplace-delete {
-    background: none;
-    border: none;
-    color: #ecf0f1;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.workplace-edit:hover, .workplace-delete:hover {
-    color: #3498db;
-}
-
-/* Buton Stilleri */
-.add-btn, .save-btn {
-    background-color: #27ae60;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    margin: 10px 0;
-}
-
-.add-btn:hover, .save-btn:hover {
-    background-color: #219653;
-}
-
-.back-btn {
-    background-color: #7f8c8d;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-right: 10px;
-}
-
-.back-btn:hover {
-    background-color: #6c7a7d;
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 .settings-btn {
@@ -243,40 +177,73 @@ body {
     bottom: 20px;
     left: 15px;
     width: calc(100% - 30px);
-    padding: 10px;
-    background-color: #8e44ad;
+}
+
+.main-content {
+    margin-left: 250px;
+    padding: 20px;
+    width: calc(100% - 250px);
+    background-color: white;
+    min-height: 100vh;
+}
+
+/* İşyeri Detay Sayfası */
+.workplace-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.back-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.back-btn:hover {
+    background-color: #2980b9;
+}
+
+.workplace-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.workplace-actions button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #3498db;
+    color: white;
+}
+
+.workplace-actions button:hover {
+    background-color: #2980b9;
+}
+
+.person-actions {
+    margin-bottom: 20px;
+}
+
+#addPersonBtn {
+    padding: 8px 16px;
+    background-color: #2ecc71;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
 }
 
-.settings-btn:hover {
-    background-color: #7d3c98;
-}
-
-/* Form Stilleri */
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-.form-group input, .form-group textarea, .form-group select {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-.form-group textarea {
-    height: 80px;
-    resize: vertical;
+#addPersonBtn:hover {
+    background-color: #27ae60;
 }
 
 /* Tablo Stilleri */
@@ -287,7 +254,7 @@ table {
 }
 
 th, td {
-    padding: 12px 15px;
+    padding: 12px;
     text-align: left;
     border-bottom: 1px solid #ddd;
 }
@@ -303,20 +270,10 @@ tr:hover {
 
 .action-btn {
     padding: 5px 10px;
-    margin-right: 5px;
     border: none;
-    border-radius: 3px;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 12px;
-}
-
-.view-btn {
-    background-color: #3498db;
-    color: white;
-}
-
-.view-btn:hover {
-    background-color: #2980b9;
+    margin: 2px;
 }
 
 .edit-btn {
@@ -325,7 +282,7 @@ tr:hover {
 }
 
 .edit-btn:hover {
-    background-color: #e67e22;
+    background-color: #d35400;
 }
 
 .delete-btn {
@@ -337,44 +294,71 @@ tr:hover {
     background-color: #c0392b;
 }
 
-.upload-btn {
-    background-color: #2ecc71;
+.ek2-btn {
+    background-color: #3498db;
     color: white;
 }
 
-.upload-btn:hover {
+.ek2-btn:hover {
+    background-color: #2980b9;
+}
+
+/* Form Stilleri */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.save-btn {
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.save-btn:hover {
     background-color: #27ae60;
 }
 
-/* İşyeri Detay Başlığı */
-.workplace-header {
+/* Aylık İşler Sayfası */
+.monthly-header {
     display: flex;
     align-items: center;
     margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #ddd;
 }
 
-.workplace-actions {
-    margin-left: auto;
-    display: flex;
-    gap: 10px;
+.documents-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
 }
 
-/* Hoşgeldiniz Ekranı */
-#welcomeScreen {
-    text-align: center;
-    padding: 50px 20px;
+.document-item {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    cursor: pointer;
 }
 
-#welcomeScreen h1 {
-    color: #2c3e50;
-    margin-bottom: 20px;
-}
-
-#welcomeScreen p {
-    color: #7f8c8d;
-    font-size: 18px;
+.document-item:hover {
+    background-color: #f0f0f0;
 }
 
 /* Responsive Tasarım */
@@ -385,10 +369,6 @@ tr:hover {
     
     .main-content {
         margin-left: 200px;
-        width: calc(100% - 200px);
-    }
-    
-    .top-bar {
         width: calc(100% - 200px);
     }
 }
@@ -405,12 +385,19 @@ tr:hover {
         width: 100%;
     }
     
-    .top-bar {
-        width: 100%;
-        position: relative;
+    .workplace-header {
+        flex-direction: column;
+        align-items: flex-start;
     }
     
-    #mainApp {
-        flex-direction: column;
+    .workplace-actions {
+        margin-top: 10px;
+        width: 100%;
+        flex-wrap: wrap;
+    }
+    
+    table {
+        display: block;
+        overflow-x: auto;
     }
 }
