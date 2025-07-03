@@ -1,187 +1,346 @@
-body {
-    font-family: Arial, sans-serif;
+/* Genel Stiller */
+* {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    background-color: #f5f5f5;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+body {
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+.screen {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Giriş Ekranı */
 .login-container {
-    width: 300px;
-    margin: 100px auto;
-    padding: 20px;
     background-color: white;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    margin: auto;
     text-align: center;
+}
+
+.login-container h2 {
+    margin-bottom: 1.5rem;
+    color: #2c3e50;
 }
 
 .login-container input {
     width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    box-sizing: border-box;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
     border: 1px solid #ddd;
     border-radius: 4px;
+    font-size: 1rem;
 }
 
 .login-container button {
     width: 100%;
-    padding: 10px;
-    background-color: #4CAF50;
+    padding: 0.75rem;
+    background-color: #3498db;
     color: white;
     border: none;
     border-radius: 4px;
+    font-size: 1rem;
     cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 .login-container button:hover {
-    background-color: #45a049;
+    background-color: #2980b9;
 }
 
-.main-container {
-    display: flex;
-    height: 100vh;
+.error-message {
+    color: #e74c3c;
+    margin-top: 1rem;
+    font-size: 0.9rem;
 }
 
-.sidebar {
-    width: 250px;
+/* Ana Ekran */
+.top-menu {
     background-color: #2c3e50;
     color: white;
-    padding: 20px 0;
-}
-
-.content-area {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
-}
-
-.menu-item {
-    padding: 15px 20px;
-    cursor: pointer;
-    border-bottom: 1px solid #34495e;
-}
-
-.menu-item:hover {
-    background-color: #34495e;
-}
-
-.submenu {
-    display: none;
-    background-color: #34495e;
-    padding: 10px 0;
-}
-
-.submenu button {
-    width: 100%;
-    padding: 8px 15px;
-    background: none;
-    border: none;
-    color: white;
-    text-align: left;
-    cursor: pointer;
-}
-
-.submenu button:hover {
-    background-color: #3d566e;
-}
-
-.header {
+    padding: 1rem;
     display: flex;
     justify-content: flex-end;
-    margin-bottom: 20px;
 }
 
 .logout-btn {
-    padding: 8px 15px;
     background-color: #e74c3c;
     color: white;
     border: none;
+    padding: 0.5rem 1rem;
     border-radius: 4px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .logout-btn:hover {
     background-color: #c0392b;
 }
 
-.back-btn {
-    padding: 8px 15px;
-    background-color: #3498db;
+.main-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.side-menu {
+    width: 250px;
+    background-color: #34495e;
+    color: white;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+.menu-section {
+    margin-bottom: 1.5rem;
+}
+
+.menu-section h3 {
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.menu-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #2c3e50;
     color: white;
     border: none;
     border-radius: 4px;
+    margin-bottom: 0.5rem;
+    text-align: left;
     cursor: pointer;
-    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-.back-btn:hover {
-    background-color: #2980b9;
+.menu-btn:hover {
+    background-color: #1a252f;
 }
 
-.workplace-header {
+.collapsible-content {
+    padding-left: 1rem;
+    display: none;
+}
+
+.collapsible-content a {
+    display: block;
+    color: #ecf0f1;
+    padding: 0.5rem 0;
+    text-decoration: none;
+}
+
+.collapsible-content a:hover {
+    color: #bdc3c7;
+}
+
+.workplace-item {
+    padding: 0.5rem;
+    margin-bottom: 0.25rem;
+    background-color: #2c3e50;
+    border-radius: 4px;
+    cursor: pointer;
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+}
+
+.workplace-item:hover {
+    background-color: #1a252f;
+}
+
+.workplace-actions {
+    display: flex;
+    gap: 0.5rem;
 }
 
 .workplace-actions button {
-    margin-left: 10px;
-    padding: 8px 15px;
-    background-color: #3498db;
+    background: none;
+    border: none;
+    color: #ecf0f1;
+    cursor: pointer;
+}
+
+.add-btn {
+    width: 100%;
+    padding: 0.5rem;
+    background-color: #27ae60;
     color: white;
     border: none;
     border-radius: 4px;
+    margin-top: 0.5rem;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
-.workplace-actions button:hover {
+.add-btn:hover {
+    background-color: #219653;
+}
+
+.settings-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #7f8c8d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    margin-top: auto;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.settings-btn:hover {
+    background-color: #6c7a7d;
+}
+
+.main-content {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    background-color: white;
+}
+
+.welcome-message {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.welcome-message h2 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+}
+
+/* İşyeri Sayfası */
+.workplace-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    align-items: center;
+}
+
+.workplace-title {
+    font-size: 1.5rem;
+    color: #2c3e50;
+}
+
+.workplace-actions-top {
+    display: flex;
+    gap: 1rem;
+}
+
+.workplace-actions-top button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.back-btn {
+    background-color: #7f8c8d;
+    color: white;
+}
+
+.back-btn:hover {
+    background-color: #6c7a7d;
+}
+
+.excel-btn {
+    background-color: #27ae60;
+    color: white;
+}
+
+.excel-btn:hover {
+    background-color: #219653;
+}
+
+.backup-btn {
+    background-color: #3498db;
+    color: white;
+}
+
+.backup-btn:hover {
     background-color: #2980b9;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-}
-
-table, th, td {
-    border: 1px solid #ddd;
-}
-
-th, td {
-    padding: 12px;
-    text-align: left;
-}
-
-th {
-    background-color: #f2f2f2;
-}
-
-tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-tr:hover {
-    background-color: #f1f1f1;
-}
-
-.action-btn {
-    padding: 5px 10px;
-    margin-right: 5px;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-}
-
-.edit-btn {
+.restore-btn {
     background-color: #f39c12;
     color: white;
 }
 
+.restore-btn:hover {
+    background-color: #d35400;
+}
+
+.persons-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.persons-table th, .persons-table td {
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    text-align: left;
+}
+
+.persons-table th {
+    background-color: #2c3e50;
+    color: white;
+}
+
+.persons-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.persons-table tr:hover {
+    background-color: #e6e6e6;
+}
+
+.action-btn {
+    padding: 0.25rem 0.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 0.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit-btn {
+    background-color: #3498db;
+    color: white;
+}
+
 .edit-btn:hover {
-    background-color: #e67e22;
+    background-color: #2980b9;
 }
 
 .delete-btn {
@@ -194,74 +353,103 @@ tr:hover {
 }
 
 .ek2-btn {
-    background-color: #2ecc71;
+    background-color: #9b59b6;
     color: white;
 }
 
 .ek2-btn:hover {
-    background-color: #27ae60;
+    background-color: #8e44ad;
 }
 
-.add-employee-btn {
-    padding: 10px 15px;
-    background-color: #2ecc71;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.add-employee-btn:hover {
-    background-color: #27ae60;
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-.form-group input, .form-group select {
+/* Modal Stilleri */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    padding: 8px;
-    box-sizing: border-box;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 400px;
+    max-width: 90%;
+    position: relative;
+}
+
+.close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #7f8c8d;
+}
+
+.modal-content h2 {
+    margin-bottom: 1.5rem;
+    color: #2c3e50;
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
     border: 1px solid #ddd;
     border-radius: 4px;
+    font-size: 1rem;
 }
 
-form button {
-    padding: 10px 15px;
+.modal-content button {
+    width: 100%;
+    padding: 0.75rem;
     background-color: #3498db;
     color: white;
     border: none;
     border-radius: 4px;
+    font-size: 1rem;
     cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-form button:hover {
+.modal-content button:hover {
     background-color: #2980b9;
 }
 
-.workplace-item {
-    padding: 10px 15px;
-    cursor: pointer;
-    border-bottom: 1px solid #3d566e;
+.file-upload {
+    margin-bottom: 1rem;
 }
 
-.workplace-item:hover {
-    background-color: #3d566e;
+.file-upload label {
+    display: block;
+    margin-bottom: 0.5rem;
 }
 
-.month-item {
-    padding: 10px 15px;
-    cursor: pointer;
-    border-bottom: 1px solid #3d566e;
-}
+/* Responsive Tasarım */
+@media (max-width: 768px) {
+    .main-layout {
+        flex-direction: column;
+    }
 
-.month-item:hover {
-    background-color: #3d566e;
+    .side-menu {
+        width: 100%;
+        height: auto;
+    }
+
+    .menu-btn {
+        padding: 0.5rem;
+    }
+
+    .workplace-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
 }
