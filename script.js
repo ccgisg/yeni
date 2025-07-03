@@ -61,6 +61,9 @@ function initializeApp() {
     // Aylık işler menüsünü başlat
     initializeMonths();
     
+    // Tarih inputlarını ayarla
+    setupDateInputs();
+    
     // Event listener'ları ekle
     setupEventListeners();
 }
@@ -222,15 +225,15 @@ function renderPeopleTable() {
         nameCell.textContent = person.name;
         row.appendChild(nameCell);
         
-        // Mevcut Muayene Tarihi
-        const currentDateCell = document.createElement('td');
-        currentDateCell.textContent = person.currentExamDate;
-        row.appendChild(currentDateCell);
+        // Muayene Tarihi
+        const examDateCell = document.createElement('td');
+        examDateCell.textContent = person.examDate || '';
+        row.appendChild(examDateCell);
         
         // Sonraki Muayene Tarihi
-        const nextDateCell = document.createElement('td');
-        nextDateCell.textContent = person.nextExamDate;
-        row.appendChild(nextDateCell);
+        const nextExamDateCell = document.createElement('td');
+        nextExamDateCell.textContent = person.nextExamDate || '';
+        row.appendChild(nextExamDateCell);
         
         // İşlemler
         const actionsCell = document.createElement('td');
@@ -240,7 +243,15 @@ function renderPeopleTable() {
         ek2Btn.textContent = 'Ek-2';
         ek2Btn.className = 'action-btn ek2-btn';
         ek2Btn.addEventListener('click', function() {
-            generateEk2Document(person);
+            openEk2Document(person);
+        });
+        
+        // Ek-2 Yükle Butonu
+        const uploadEk2Btn = document.createElement('button');
+        uploadEk2Btn.textContent = 'Ek-2 Yükle';
+        uploadEk2Btn.className = 'action-btn ek2-btn';
+        uploadEk2Btn.addEventListener('click', function() {
+            uploadEk2Document(person.tc);
         });
         
         // Ek-2 Göster Butonu
@@ -268,6 +279,7 @@ function renderPeopleTable() {
         });
         
         actionsCell.appendChild(ek2Btn);
+        actionsCell.appendChild(uploadEk2Btn);
         actionsCell.appendChild(showEk2Btn);
         actionsCell.appendChild(editBtn);
         actionsCell.appendChild(deleteBtn);
@@ -275,6 +287,93 @@ function renderPeopleTable() {
         
         tableBody.appendChild(row);
     });
+}
+
+// Tarih formatlama fonksiyonu
+function formatDate(date) {
+    if (!date) return '';
+    const [day, month, year] = date.split('.');
+    return `${day.padStart(2, '0')}.${month.padStart(2, '0')}.${year}`;
+}
+
+// Tarih inputlarına otomatik nokta ekleme
+function setupDateInputs() {
+    document.querySelectorAll('input[placeholder="gg.aa.yyyy"]').forEach(input => {
+        input.addEventListener('input', function(e) {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 2 && value.length <= 4) {
+                value = value.substring(0, 2) + '.' + value.substring(2);
+            } else if (value.length > 4) {
+                value = value.substring(0, 2) + '.' + value.substring(2, 4) + '.' + value.substring(4, 8);
+            }
+            this.value = value.substring(0, 10);
+        });
+    });
+}
+
+// Ek-2 belgesini aç
+function openEk2Document(person) {
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const year = today.getFullYear();
+    const examDate = `${day}.${month}.${year}`;
+    
+    // 5 yıl sonrasını hesapla
+    const nextExamDate = `${day}.${month}.${year + 5}`;
+    
+    alert(`Ek-2 belgesi oluşturuluyor:\nTC: ${person.tc}\nAd Soyad: ${person.name}\nMuayene Tarihi: ${examDate}\nSonraki Muayene Tarihi: ${nextExamDate}`);
+    
+    // Kişiyi güncelle
+    person.examDate = examDate;
+    person.nextExamDate = nextExamDate;
+    savePeople();
+    renderPeopleTable();
+    
+    // Masaüstüne kaydetme işlemi (simülasyon)
+    const fileName = `Ek2_${person.tc}_${person.name.replace(/\s+/g, '_')}.docx`;
+    console.log(`Belge ${fileName} olarak kaydedildi.`);
+}
+
+// Ek-2 belgesi yükle
+function uploadEk2Document(tc) {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.docx';
+    
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            alert(`${file.name} dosyası yüklendi (TC: ${tc})`);
+            // Burada dosyayı kaydetme işlemi yapılacak
+        }
+    });
+    
+    fileInput.click();
+}
+
+// Ek-2 belgelerini göster
+function showEk2Documents(tc) {
+    const ek2ListModal = document.getElementById('ek2ListModal');
+    const ek2DocumentsList = document.getElementById('ek2DocumentsList');
+    
+    // Burada gerçekte dosya sisteminden belgeleri okumak gerekir
+    // Simülasyon olarak birkaç örnek belge gösteriyoruz
+    ek2DocumentsList.innerHTML = '';
+    
+    for (let i = 1; i <= 3; i++) {
+        const docElement = document.createElement('div');
+        docElement.className = 'document-card';
+        docElement.textContent = `Ek2_${tc}_${i}.docx`;
+        
+        docElement.addEventListener('dblclick', function() {
+            alert(`Belge açılıyor: Ek2_${tc}_${i}.docx`);
+        });
+        
+        ek2DocumentsList.appendChild(docElement);
+    }
+    
+    ek2ListModal.style.display = 'block';
 }
 
 // Aylık belgeleri aç
@@ -315,41 +414,6 @@ function openMonthlyDocuments(monthName, year) {
         
         documentsList.appendChild(docElement);
     });
-}
-
-// Ek-2 belgesi oluştur
-function generateEk2Document(person) {
-    // Burada gerçekte ccgisg_ek_2.docx dosyasını açıp düzenlemek gerekir
-    // Simülasyon olarak bir uyarı gösteriyoruz
-    alert(`Ek-2 belgesi oluşturuluyor:\nTC: ${person.tc}\nAd Soyad: ${person.name}`);
-    
-    // Masaüstüne kaydetme işlemi (simülasyon)
-    const fileName = `Ek2_${person.tc}_${person.name.replace(/\s+/g, '_')}.docx`;
-    console.log(`Belge ${fileName} olarak kaydedildi.`);
-}
-
-// Ek-2 belgelerini göster
-function showEk2Documents(tc) {
-    const ek2ListModal = document.getElementById('ek2ListModal');
-    const ek2DocumentsList = document.getElementById('ek2DocumentsList');
-    
-    // Burada gerçekte dosya sisteminden belgeleri okumak gerekir
-    // Simülasyon olarak birkaç örnek belge gösteriyoruz
-    ek2DocumentsList.innerHTML = '';
-    
-    for (let i = 1; i <= 3; i++) {
-        const docElement = document.createElement('div');
-        docElement.className = 'document-card';
-        docElement.textContent = `Ek2_${tc}_${i}.docx`;
-        
-        docElement.addEventListener('dblclick', function() {
-            alert(`Belge açılıyor: Ek2_${tc}_${i}.docx`);
-        });
-        
-        ek2DocumentsList.appendChild(docElement);
-    }
-    
-    ek2ListModal.style.display = 'block';
 }
 
 // Event listener'ları kur
@@ -425,8 +489,6 @@ function setupEventListeners() {
         document.getElementById('personId').value = '';
         document.getElementById('personTC').value = '';
         document.getElementById('personName').value = '';
-        document.getElementById('currentExamDate').value = '';
-        document.getElementById('nextExamDate').value = '';
         
         personModal.style.display = 'block';
     });
@@ -438,15 +500,16 @@ function setupEventListeners() {
         const personId = document.getElementById('personId').value;
         const personData = {
             tc: document.getElementById('personTC').value,
-            name: document.getElementById('personName').value,
-            currentExamDate: document.getElementById('currentExamDate').value,
-            nextExamDate: document.getElementById('nextExamDate').value
+            name: document.getElementById('personName').value
         };
         
         if (personId) {
             // Düzenleme
             const index = people.findIndex(p => p.id === personId);
             if (index !== -1) {
+                // Mevcut examDate ve nextExamDate'i koru
+                personData.examDate = people[index].examDate;
+                personData.nextExamDate = people[index].nextExamDate;
                 people[index] = { ...people[index], ...personData };
             }
         } else {
@@ -538,8 +601,6 @@ function editPerson(index) {
     document.getElementById('personId').value = person.id;
     document.getElementById('personTC').value = person.tc;
     document.getElementById('personName').value = person.name;
-    document.getElementById('currentExamDate').value = person.currentExamDate;
-    document.getElementById('nextExamDate').value = person.nextExamDate;
     
     personModal.style.display = 'block';
 }
