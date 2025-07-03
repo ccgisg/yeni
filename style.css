@@ -4,102 +4,123 @@ body {
     margin: 0;
     padding: 0;
     background-color: #f5f5f5;
+    color: #333;
 }
 
-.hidden {
-    display: none !important;
-}
-
-/* Giriş Sayfası Stilleri */
-.login-container {
-    width: 300px;
-    margin: 100px auto;
-    padding: 20px;
-    background: white;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    text-align: center;
-}
-
-.login-container input[type="password"] {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-.login-container button {
-    width: 100%;
-    padding: 10px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-.login-container button:hover {
-    background-color: #45a049;
-}
-
-/* Ana Uygulama Stilleri */
-#app-container {
+.container {
     display: flex;
     min-height: 100vh;
 }
 
+/* Sidebar Stilleri */
 .sidebar {
     width: 250px;
     background-color: #2c3e50;
     color: white;
-    padding: 20px 10px;
-    box-sizing: border-box;
-    position: relative;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
 }
 
-.menu-header {
+.menu-section {
+    margin-bottom: 20px;
+}
+
+.menu-btn {
+    width: 100%;
     padding: 10px;
-    margin-top: 20px;
-    font-weight: bold;
-    border-bottom: 1px solid #34495e;
-}
-
-.menu-item {
-    padding: 10px;
-    cursor: pointer;
-    margin-bottom: 5px;
-    border-radius: 4px;
-    transition: background-color 0.3s;
-}
-
-.menu-item:hover {
-    background-color: #34495e;
-}
-
-.menu-item.active {
+    margin-bottom: 10px;
     background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: left;
 }
 
-.submenu {
-    margin-left: 15px;
-    display: none;
+.menu-btn:hover {
+    background-color: #2980b9;
 }
 
-.submenu.show {
-    display: block;
+.settings-btn {
+    position: absolute;
+    bottom: 20px;
+    width: calc(250px - 40px);
+    background-color: #e74c3c;
 }
 
-.workplaces-list {
-    max-height: 300px;
-    overflow-y: auto;
+.settings-btn:hover {
+    background-color: #c0392b;
 }
 
-.workplace-item {
+.action-btn {
+    width: 100%;
     padding: 8px;
-    margin: 5px 0;
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.action-btn:hover {
+    background-color: #219653;
+}
+
+.dropdown-content {
+    display: none;
+    background-color: #34495e;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 5px;
+}
+
+.dropdown-content a {
+    color: white;
+    padding: 8px 0;
+    display: block;
+    text-decoration: none;
+}
+
+.dropdown-content a:hover {
+    color: #3498db;
+}
+
+/* Ana İçerik Stilleri */
+.main-content {
+    flex: 1;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.logout-btn {
+    padding: 8px 15px;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.logout-btn:hover {
+    background-color: #c0392b;
+}
+
+#contentArea {
+    background-color: white;
+    padding: 20px;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* İşyeri Listesi Stilleri */
+.workplace-item {
+    padding: 10px;
+    margin-bottom: 5px;
     background-color: #34495e;
     border-radius: 4px;
     cursor: pointer;
@@ -109,61 +130,58 @@ body {
     background-color: #3d566e;
 }
 
-.settings-button {
-    position: absolute;
-    bottom: 20px;
-    left: 10px;
-    right: 10px;
-}
-
-.main-content {
-    flex: 1;
-    padding: 20px;
-    background-color: #ecf0f1;
-}
-
-.action-buttons {
-    margin-bottom: 20px;
-}
-
-.action-buttons button {
-    padding: 8px 12px;
-    margin-right: 10px;
-    background-color: #3498db;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.action-buttons button:hover {
-    background-color: #2980b9;
-}
-
-/* Tablo Stilleri */
-table {
+/* Çalışan Listesi Tablosu */
+.employee-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
 }
 
-th, td {
+.employee-table th, .employee-table td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
 }
 
-th {
+.employee-table th {
     background-color: #3498db;
     color: white;
 }
 
-tr:nth-child(even) {
+.employee-table tr:nth-child(even) {
     background-color: #f2f2f2;
 }
 
-tr:hover {
-    background-color: #e6e6e6;
+.employee-table tr:hover {
+    background-color: #ddd;
+}
+
+.table-btn {
+    padding: 5px 10px;
+    margin: 2px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.btn-show {
+    background-color: #3498db;
+    color: white;
+}
+
+.btn-edit {
+    background-color: #f39c12;
+    color: white;
+}
+
+.btn-delete {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.btn-ek2 {
+    background-color: #27ae60;
+    color: white;
 }
 
 /* Modal Stilleri */
@@ -179,88 +197,56 @@ tr:hover {
 }
 
 .modal-content {
-    background-color: #fefefe;
+    background-color: white;
     margin: 10% auto;
     padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 500px;
     border-radius: 5px;
-    position: relative;
+    width: 400px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-.close {
-    position: absolute;
-    right: 15px;
-    top: 10px;
-    color: #aaa;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
+.modal-content h2 {
+    margin-top: 0;
+    color: #2c3e50;
 }
 
-.close:hover {
-    color: black;
-}
-
-/* Form Stilleri */
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-.form-group input, .form-group select, .form-group textarea {
+.modal-content input {
     width: 100%;
-    padding: 8px;
+    padding: 10px;
+    margin: 8px 0;
     border: 1px solid #ddd;
     border-radius: 4px;
     box-sizing: border-box;
 }
 
-button[type="submit"] {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 15px;
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.modal-buttons button {
+    padding: 8px 15px;
+    margin-left: 10px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 16px;
 }
 
-button[type="submit"]:hover {
-    background-color: #45a049;
-}
-
-/* İşlem Butonları */
-.action-btn {
-    padding: 5px 10px;
-    margin: 2px;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 12px;
-}
-
-.edit-btn {
-    background-color: #f39c12;
+.modal-buttons button:first-child {
+    background-color: #27ae60;
     color: white;
 }
 
-.delete-btn {
+.modal-buttons button:first-child:hover {
+    background-color: #219653;
+}
+
+.modal-buttons button:last-child {
     background-color: #e74c3c;
     color: white;
 }
 
-.ek2-btn {
-    background-color: #3498db;
-    color: white;
-}
-
-.action-btn:hover {
-    opacity: 0.8;
+.modal-buttons button:last-child:hover {
+    background-color: #c0392b;
 }
