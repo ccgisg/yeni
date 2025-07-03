@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İşyeri Hekimliği Veri Kayıt Programı</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="login-container" class="login-container">
+        <h2>İşyeri Hekimliği</h2>
+        <form id="loginForm">
+            <input type="password" id="password" placeholder="Şifre" required>
+            <button type="submit">Giriş Yap</button>
+        </form>
+    </div>
+
+    <div id="app-container" class="hidden">
+        <div class="sidebar">
+            <div class="menu-item" id="monthlyTasks">Aylık İşlerim</div>
+            <div class="submenu" id="monthlySubmenu">
+                <div class="menu-item month-item" data-month="1">Ocak</div>
+                <div class="menu-item month-item" data-month="2">Şubat</div>
+                <div class="menu-item month-item" data-month="3">Mart</div>
+                <div class="menu-item month-item" data-month="4">Nisan</div>
+                <div class="menu-item month-item" data-month="5">Mayıs</div>
+                <div class="menu-item month-item" data-month="6">Haziran</div>
+                <div class="menu-item month-item" data-month="7">Temmuz</div>
+                <div class="menu-item month-item" data-month="8">Ağustos</div>
+                <div class="menu-item month-item" data-month="9">Eylül</div>
+                <div class="menu-item month-item" data-month="10">Ekim</div>
+                <div class="menu-item month-item" data-month="11">Kasım</div>
+                <div class="menu-item month-item" data-month="12">Aralık</div>
+            </div>
+            
+            <div class="menu-header">İşyerlerim</div>
+            <div id="workplacesList" class="workplaces-list">
+                <!-- Dinamik olarak işyerleri listelenecek -->
+            </div>
+            
+            <div class="menu-item" id="addWorkplace">+ İşyeri Ekle</div>
+            
+            <div class="menu-item settings-button" id="settings">Ayarlar</div>
+        </div>
+        
+        <div class="main-content">
+            <div class="action-buttons">
+                <button id="importExcel">Excel'den Al</button>
+                <button id="exportExcel">Excel'e Ver</button>
+                <button id="backup">Yedek Al</button>
+                <button id="restore">Yedekten Dön</button>
+            </div>
+            
+            <div id="contentArea">
+                <h2>Hoş Geldiniz</h2>
+                <p>Soldaki menüden bir işyeri seçin veya yeni işyeri ekleyin.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Pencereler -->
+    <div id="addWorkplaceModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Yeni İşyeri Ekle</h3>
+            <input type="text" id="newWorkplaceName" placeholder="İşyeri Adı">
+            <button id="saveWorkplace">Kaydet</button>
+        </div>
+    </div>
+
+    <div id="addEmployeeModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Yeni Çalışan Ekle</h3>
+            <form id="employeeForm">
+                <div class="form-group">
+                    <label for="employeeTcNo">TC Kimlik No:</label>
+                    <input type="text" id="employeeTcNo" required>
+                </div>
+                <div class="form-group">
+                    <label for="employeeFullName">Adı Soyadı:</label>
+                    <input type="text" id="employeeFullName" required>
+                </div>
+                <div class="form-group">
+                    <label for="currentExamDate">Mevcut Muayene Tarihi:</label>
+                    <input type="date" id="currentExamDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="nextExamDate">Sonraki Muayene Tarihi:</label>
+                    <input type="date" id="nextExamDate" required>
+                </div>
+                <button type="submit">Kaydet</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="settingsModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Doktor Bilgileri</h2>
+            <form id="doctorForm">
+                <div class="form-group">
+                    <label>Adı Soyadı:</label>
+                    <input type="text" id="doctorName" required>
+                </div>
+                <div class="form-group">
+                    <label>Diploma Tarih ve No:</label>
+                    <input type="text" id="diplomaInfo" required>
+                </div>
+                <div class="form-group">
+                    <label>Diploma Tescil Tarih ve No:</label>
+                    <input type="text" id="diplomaRegInfo" required>
+                </div>
+                <div class="form-group">
+                    <label>İşyeri Hekimliği Belgesi Tarih ve No:</label>
+                    <input type="text" id="workplaceDoctorCert" required>
+                </div>
+                <button type="submit">Kaydet</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
