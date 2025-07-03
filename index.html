@@ -3,238 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İşyeri Hekimliği Veri Kayıt Programı</title>
+    <title>İşyeri Hekimliği Veri Kayıt</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <!-- Şifre Giriş Ekranı -->
-    <div id="loginScreen" class="login-container">
-        <div class="login-box">
+    <div id="passwordScreen" class="modal">
+        <div class="modal-content">
             <h2>Giriş Yap</h2>
-            <input type="password" id="passwordInput" placeholder="Şifre" />
+            <input type="password" id="passwordInput" placeholder="Şifre" value="1234">
             <button id="loginButton">Giriş Yap</button>
             <p id="loginError" class="error-message"></p>
         </div>
     </div>
 
-    <!-- Ana Uygulama Ekranı -->
-    <div id="appContainer" class="app-container hidden">
+    <!-- Ana Sayfa -->
+    <div id="mainApp" style="display: none;">
         <!-- Üst Menü -->
-        <div class="header">
+        <div class="top-bar">
             <button id="logoutButton" class="logout-btn">Çıkış</button>
         </div>
 
-        <!-- Sol Menü -->
+        <!-- Yan Menü -->
         <div class="sidebar">
             <div class="menu-section">
-                <button id="monthlyJobsButton" class="dropdown-btn">Aylık İşlerim ▼</button>
-                <div id="monthlyJobsDropdown" class="dropdown-container"></div>
-            </div>
-
-            <div class="menu-section">
-                <h3>İş Yerlerim</h3>
-                <div id="workplacesList" class="workplaces-list"></div>
-                <div class="workplace-actions">
-                    <button id="addWorkplaceButton">İşyeri Ekle</button>
-                    <button id="editWorkplaceButton">Düzenle</button>
-                    <button id="deleteWorkplaceButton">Sil</button>
+                <button class="menu-btn" id="monthlyWorksBtn">Aylık İşlerim ▼</button>
+                <div id="monthlyWorksMenu" class="submenu">
+                    <!-- Aylar buraya dinamik olarak eklenecek -->
                 </div>
             </div>
 
-            <button id="settingsButton" class="settings-btn">Ayarla</button>
+            <div class="menu-section">
+                <h3>İşyerlerim</h3>
+                <div id="workplacesList">
+                    <!-- İşyerleri buraya dinamik olarak eklenecek -->
+                </div>
+                <button id="addWorkplaceBtn" class="add-btn">İşyeri Ekle</button>
+            </div>
+
+            <button id="settingsBtn" class="settings-btn">Ayarla</button>
         </div>
 
         <!-- Ana İçerik -->
         <div class="main-content">
-            <div id="homeScreen" class="content-section">
-                <h2>Hoş Geldiniz</h2>
-                <p>Soldaki menüden işyerlerinizi seçebilir veya yeni işyerleri ekleyebilirsiniz.</p>
+            <div id="welcomeScreen">
+                <h1>İşyeri Hekimliği Veri Kayıt Programı</h1>
+                <p>Soldaki menüden işyerlerinizi seçebilir veya yeni işyeri ekleyebilirsiniz.</p>
             </div>
 
-            <div id="workplaceScreen" class="content-section hidden">
+            <!-- İşyeri Detay Sayfası -->
+            <div id="workplaceDetail" style="display: none;">
                 <div class="workplace-header">
                     <button id="backButton" class="back-btn">← Geri</button>
                     <h2 id="workplaceTitle"></h2>
                     <div class="workplace-actions">
-                        <button id="exportExcelButton">Excel'e Ver</button>
-                        <button id="importExcelButton">Excel'den Al</button>
-                        <button id="backupButton">Yedek Al</button>
-                        <button id="restoreButton">Yedekten Dön</button>
+                        <button id="exportExcelBtn">Excel'e Ver</button>
+                        <button id="importExcelBtn">Excel'den Al</button>
+                        <button id="backupBtn">Yedek Al</button>
+                        <button id="restoreBtn">Yedekten Dön</button>
                     </div>
                 </div>
 
-                <div class="employee-table-container">
-                    <table id="employeeTable" class="employee-table">
-                        <thead>
-                            <tr>
-                                <th>S.No</th>
-                                <th>TC Kimlik No</th>
-                                <th>Ad Soyad</th>
-                                <th>Mevcut Muayene</th>
-                                <th>Sonraki Muayene</th>
-                                <th>EK-2</th>
-                                <th>İşlemler</th>
-                            </tr>
-                        </thead>
-                        <tbody id="employeeTableBody"></tbody>
-                    </table>
-                </div>
+                <button id="addEmployeeBtn" class="add-btn">Kişi Ekle</button>
 
-                <button id="addEmployeeButton" class="add-employee-btn">Yeni Çalışan Ekle</button>
+                <table id="employeesTable">
+                    <thead>
+                        <tr>
+                            <th>S.No</th>
+                            <th>TC Kimlik No</th>
+                            <th>Ad Soyad</th>
+                            <th>Mevcut Muayene</th>
+                            <th>Sonraki Muayene</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Çalışanlar buraya dinamik olarak eklenecek -->
+                    </tbody>
+                </table>
             </div>
 
-            <div id="settingsScreen" class="content-section hidden">
+            <!-- Doktor Bilgileri Formu -->
+            <div id="settingsForm" style="display: none;">
                 <h2>Doktor Bilgileri</h2>
                 <form id="doctorInfoForm">
                     <div class="form-group">
-                        <label for="doctorName">Ad:</label>
+                        <label for="doctorName">Adı Soyadı:</label>
                         <input type="text" id="doctorName" required>
                     </div>
                     <div class="form-group">
-                        <label for="doctorSurname">Soyad:</label>
-                        <input type="text" id="doctorSurname" required>
+                        <label for="diplomaDate">Diploma Tarih ve No:</label>
+                        <input type="text" id="diplomaDate" required>
                     </div>
                     <div class="form-group">
-                        <label for="doctorLicense">Sicil No:</label>
-                        <input type="text" id="doctorLicense" required>
+                        <label for="diplomaRegDate">Diploma Tescil Tarih ve No:</label>
+                        <input type="text" id="diplomaRegDate" required>
                     </div>
                     <div class="form-group">
-                        <label for="doctorPhone">Telefon:</label>
-                        <input type="tel" id="doctorPhone">
-                    </div>
-                    <div class="form-group">
-                        <label for="doctorEmail">E-posta:</label>
-                        <input type="email" id="doctorEmail">
+                        <label for="workplaceDoctorCert">İşyeri Hekimliği Belgesi Tarih ve No:</label>
+                        <input type="text" id="workplaceDoctorCert" required>
                     </div>
                     <button type="submit" class="save-btn">Kaydet</button>
                 </form>
             </div>
-        </div>
-    </div>
 
-    <!-- Modal Pencereler -->
-    <div id="addWorkplaceModal" class="modal hidden">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Yeni İşyeri Ekle</h2>
-            <form id="addWorkplaceForm">
-                <div class="form-group">
-                    <label for="workplaceName">İşyeri Adı:</label>
-                    <input type="text" id="workplaceName" required>
+            <!-- Kişi Ekle/Düzenle Formu -->
+            <div id="employeeForm" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <span class="close-btn">&times;</span>
+                    <h2 id="employeeFormTitle">Kişi Ekle</h2>
+                    <form id="employeeDataForm">
+                        <input type="hidden" id="employeeId">
+                        <div class="form-group">
+                            <label for="employeeTC">TC Kimlik No:</label>
+                            <input type="text" id="employeeTC" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="employeeName">Adı Soyadı:</label>
+                            <input type="text" id="employeeName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="currentExam">Mevcut Muayene Tarihi:</label>
+                            <input type="text" id="currentExam" placeholder="gg.aa.yyyy" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="nextExam">Sonraki Muayene Tarihi:</label>
+                            <input type="text" id="nextExam" placeholder="gg.aa.yyyy" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="ek2File">EK-2 Dosyası:</label>
+                            <input type="file" id="ek2File" accept=".doc,.docx,.pdf">
+                        </div>
+                        <button type="submit" class="save-btn">Kaydet</button>
+                    </form>
                 </div>
-                <div class="form-group">
-                    <label for="workplaceAddress">Adres:</label>
-                    <textarea id="workplaceAddress"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="workplacePhone">Telefon:</label>
-                    <input type="tel" id="workplacePhone">
-                </div>
-                <button type="submit" class="save-btn">Kaydet</button>
-            </form>
-        </div>
-    </div>
+            </div>
 
-    <div id="editWorkplaceModal" class="modal hidden">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>İşyeri Düzenle</h2>
-            <form id="editWorkplaceForm">
-                <input type="hidden" id="editWorkplaceId">
-                <div class="form-group">
-                    <label for="editWorkplaceName">İşyeri Adı:</label>
-                    <input type="text" id="editWorkplaceName" required>
+            <!-- İşyeri Ekle/Düzenle Formu -->
+            <div id="workplaceForm" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <span class="close-btn">&times;</span>
+                    <h2 id="workplaceFormTitle">İşyeri Ekle</h2>
+                    <form id="workplaceDataForm">
+                        <input type="hidden" id="workplaceId">
+                        <div class="form-group">
+                            <label for="workplaceName">İşyeri Adı:</label>
+                            <input type="text" id="workplaceName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="workplaceSGK">SGK Sicil No:</label>
+                            <input type="text" id="workplaceSGK">
+                        </div>
+                        <div class="form-group">
+                            <label for="workplaceAddress">Adres:</label>
+                            <textarea id="workplaceAddress"></textarea>
+                        </div>
+                        <button type="submit" class="save-btn">Kaydet</button>
+                    </form>
                 </div>
-                <div class="form-group">
-                    <label for="editWorkplaceAddress">Adres:</label>
-                    <textarea id="editWorkplaceAddress"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="editWorkplacePhone">Telefon:</label>
-                    <input type="tel" id="editWorkplacePhone">
-                </div>
-                <button type="submit" class="save-btn">Kaydet</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="addEmployeeModal" class="modal hidden">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Yeni Çalışan Ekle</h2>
-            <form id="addEmployeeForm">
-                <div class="form-group">
-                    <label for="employeeTc">TC Kimlik No:</label>
-                    <input type="text" id="employeeTc" required>
-                </div>
-                <div class="form-group">
-                    <label for="employeeName">Ad:</label>
-                    <input type="text" id="employeeName" required>
-                </div>
-                <div class="form-group">
-                    <label for="employeeSurname">Soyad:</label>
-                    <input type="text" id="employeeSurname" required>
-                </div>
-                <div class="form-group">
-                    <label for="currentExamDate">Mevcut Muayene Tarihi:</label>
-                    <input type="text" id="currentExamDate" class="date-input" placeholder="gg.aa.yyyy" required>
-                </div>
-                <div class="form-group">
-                    <label for="nextExamDate">Sonraki Muayene Tarihi:</label>
-                    <input type="text" id="nextExamDate" class="date-input" placeholder="gg.aa.yyyy" required>
-                </div>
-                <div class="form-group">
-                    <label for="ek2File">EK-2 Dosyası:</label>
-                    <input type="file" id="ek2File">
-                </div>
-                <button type="submit" class="save-btn">Kaydet</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="editEmployeeModal" class="modal hidden">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Çalışan Düzenle</h2>
-            <form id="editEmployeeForm">
-                <input type="hidden" id="editEmployeeId">
-                <div class="form-group">
-                    <label for="editEmployeeTc">TC Kimlik No:</label>
-                    <input type="text" id="editEmployeeTc" required>
-                </div>
-                <div class="form-group">
-                    <label for="editEmployeeName">Ad:</label>
-                    <input type="text" id="editEmployeeName" required>
-                </div>
-                <div class="form-group">
-                    <label for="editEmployeeSurname">Soyad:</label>
-                    <input type="text" id="editEmployeeSurname" required>
-                </div>
-                <div class="form-group">
-                    <label for="editCurrentExamDate">Mevcut Muayene Tarihi:</label>
-                    <input type="text" id="editCurrentExamDate" class="date-input" placeholder="gg.aa.yyyy" required>
-                </div>
-                <div class="form-group">
-                    <label for="editNextExamDate">Sonraki Muayene Tarihi:</label>
-                    <input type="text" id="editNextExamDate" class="date-input" placeholder="gg.aa.yyyy" required>
-                </div>
-                <div class="form-group">
-                    <label>EK-2:</label>
-                    <button type="button" id="uploadEk2Btn" class="ek2-btn">EK-2 Yükle</button>
-                    <button type="button" id="viewEk2Btn" class="ek2-btn">EK-2 Göster</button>
-                    <input type="file" id="editEk2File" class="hidden">
-                </div>
-                <button type="submit" class="save-btn">Kaydet</button>
-                <button type="button" id="deleteEmployeeBtn" class="delete-btn">Sil</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="ek2ViewerModal" class="modal hidden">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>EK-2 Belgesi</h2>
-            <div id="ek2ViewerContent"></div>
+            </div>
         </div>
     </div>
 
