@@ -332,13 +332,13 @@ function showEk2Form(workplaceId, employeeId) {
 
 // Excel'den veri al
 function importFromExcel() {
-    alert('Excel'den veri alma işlemi burada gerçekleştirilecek');
+    alert('Excel\'den veri alma işlemi burada gerçekleştirilecek');
     // Burada SheetJS veya benzeri bir kütüphane kullanılabilir
 }
 
 // Excel'e veri aktar
 function exportToExcel() {
-    alert('Excel'e veri aktarma işlemi burada gerçekleştirilecek');
+    alert('Excel\'e veri aktarma işlemi burada gerçekleştirilecek');
     // Burada SheetJS veya benzeri bir kütüphane kullanılabilir
 }
 
